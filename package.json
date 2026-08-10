@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "apexcharts": "^6.8.0",
+    "axios": "^1.19.0",
     "clsx": "^2.1.1",
     "flatpickr": "^4.6.13",
     "react": "^19.2.8",
