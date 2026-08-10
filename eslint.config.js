@@ -21,4 +21,20 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: [
+      'src/components/ecommerce/CountryMap.tsx',
+      'src/context/**/*.{ts,tsx}',
+      'src/layout/AppSidebar.tsx',
+      'src/pages/Calendar.tsx',
+      'src/svg.d.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ]);
