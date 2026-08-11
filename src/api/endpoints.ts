@@ -3,6 +3,8 @@ export const endpoints = {
     login: '/auth/login',
     logout: '/auth/logout',
     me: '/auth/me',
+    profile: '/profile',
+    profileAvatar: '/profile/avatar',
   },
 
   users: {

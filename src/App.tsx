@@ -5,14 +5,22 @@ import AppLayout from './layout/AppLayout';
 
 import SignIn from './pages/AuthPages/SignIn';
 import SignUp from './pages/AuthPages/SignUp';
+import ForgotPassword from './pages/AuthPages/ForgotPassword';
+import ResetPassword from './pages/AuthPages/ResetPassword';
 
 import Home from './pages/Dashboard/Home';
-import NotFound from './pages/OtherPage/NotFound';
+import GuestNotFound from './pages/OtherPage/GuestNotFound';
+import ProtectedNotFound from './pages/OtherPage/ProtectedNotFound';
 
 import Users from './pages/Users/Users';
 import Roles from './pages/Roles/Roles';
 import Settings from './pages/Settings/Settings';
 import UserProfiles from './pages/UserProfiles';
+
+import GuestRoute from './routes/GuestRoute';
+import ProtectedRoute from './routes/ProtectedRoute';
+
+import { routes } from './routes/routes';
 
 export default function App() {
   return (
@@ -20,28 +28,40 @@ export default function App() {
       <ScrollToTop />
 
       <Routes>
-        {/* Application Layout */}
-        <Route element={<AppLayout />}>
-          {/* Dashboard */}
-          <Route index path="/" element={<Home />} />
+        {/* Guest Routes */}
+        <Route element={<GuestRoute />}>
+          <Route path={routes.auth.signIn} element={<SignIn />} />
 
-          {/* Administration */}
-          <Route path="/users" element={<Users />} />
-          <Route path="/roles" element={<Roles />} />
+          <Route path={routes.auth.signUp} element={<SignUp />} />
 
-          {/* Account */}
-          <Route path="/profile" element={<UserProfiles />} />
+          <Route
+            path={routes.auth.forgotPassword}
+            element={<ForgotPassword />}
+          />
 
-          {/* Settings */}
-          <Route path="/settings" element={<Settings />} />
+          <Route path={routes.auth.resetPassword} element={<ResetPassword />} />
         </Route>
 
-        {/* Authentication */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path={routes.dashboard.home} element={<Home />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
+            <Route path={routes.users.index} element={<Users />} />
+
+            <Route path={routes.roles.index} element={<Roles />} />
+
+            <Route path={routes.settings.index} element={<Settings />} />
+
+            <Route path={routes.profile.index} element={<UserProfiles />} />
+
+            {/* Protected 404 */}
+            <Route path="*" element={<ProtectedNotFound />} />
+          </Route>
+        </Route>
+
+        {/* Guest 404 */}
+        <Route path="*" element={<GuestNotFound />} />
       </Routes>
     </Router>
   );

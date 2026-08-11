@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
+import { routes } from '../routes/routes';
 
 // Assume these icons are imported from an icon library
 import {
@@ -23,7 +24,8 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: 'Dashboard',
-    subItems: [{ name: 'Dashboard', path: '/', pro: false }],
+    path: routes.dashboard.home,
+    // subItems: [{ name: 'Dashboard', path: '/', pro: false }],
   },
   {
     icon: <UserCircleIcon />,

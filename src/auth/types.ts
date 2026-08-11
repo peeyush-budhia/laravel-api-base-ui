@@ -5,6 +5,7 @@ export interface AuthUser {
   full_name: string;
   email: string;
   avatar: string | null;
+  role: string | null;
   status: string;
   email_verified_at: string | null;
   last_login_at: string | null;
@@ -30,4 +31,10 @@ export interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+}
+
+export interface UpdateProfileData {
+  first_name: string;
+  last_name: string;
+  email: string;
 }
