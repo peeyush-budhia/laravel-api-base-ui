@@ -1,14 +1,15 @@
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 
-const PageMeta = ({
-  title,
-  description,
-}: {
+import { env } from '../../config/env';
+
+interface PageMetaProps {
   title: string;
   description: string;
-}) => (
+}
+
+const PageMeta = ({ title, description }: PageMetaProps) => (
   <Helmet>
-    <title>{title}</title>
+    <title>{`${title} | ${env.appName}`}</title>
     <meta name="description" content={description} />
   </Helmet>
 );

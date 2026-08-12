@@ -268,7 +268,7 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/laravel-api-base-horizontal.png"
                 alt="Logo"
                 width={150}
                 height={40}
