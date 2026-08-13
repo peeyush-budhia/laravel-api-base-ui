@@ -55,6 +55,7 @@ export default function SignInForm() {
       await login({
         login: loginValue,
         password,
+        rememberMe: isChecked,
       });
 
       const destination = locationState?.from

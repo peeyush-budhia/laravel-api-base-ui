@@ -6,13 +6,18 @@ import type {
   LoginCredentials,
   LoginData,
   UpdateProfileData,
+  ResetPasswordData,
 } from './types';
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<LoginData> {
     const response = await apiClient.post<ApiResponse<LoginData>>(
       endpoints.auth.login,
-      credentials,
+      {
+        login: credentials.login,
+        password: credentials.password,
+        remember_me: credentials.rememberMe,
+      },
     );
 
     return response.data.data;
@@ -50,5 +55,15 @@ export const authService = {
     );
 
     return response.data.data;
+  },
+
+  async forgotPassword(email: string): Promise<void> {
+    await apiClient.post<ApiResponse>(endpoints.auth.forgotPassword, {
+      email,
+    });
+  },
+
+  async resetPassword(data: ResetPasswordData): Promise<void> {
+    await apiClient.post<ApiResponse>(endpoints.auth.resetPassword, data);
   },
 };

@@ -17,6 +17,7 @@ export interface AuthUser {
 export interface LoginCredentials {
   login: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface LoginData {
@@ -37,4 +38,11 @@ export interface UpdateProfileData {
   first_name: string;
   last_name: string;
   email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
 }
