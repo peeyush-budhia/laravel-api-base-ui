@@ -18,6 +18,7 @@ export const routes = {
     index: '/users',
     create: '/users/create',
     show: (id: string) => `/users/${id}`,
+    showPattern: '/users/:id',
     edit: (id: string) => `/users/${id}/edit`,
   },
 
