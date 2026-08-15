@@ -58,7 +58,7 @@ export default function UserDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
-        <span className="mr-3 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-brand-500 text-sm font-semibold text-white">
+        <span className="mr-3 flex h-11 w-11 items-center justify-center overflow-hidden border border-gray-200 rounded-full text-sm font-semibold text-blue-600">
           {user.avatar ? (
             <img
               src={user.avatar}
