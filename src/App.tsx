@@ -21,6 +21,7 @@ import GuestRoute from './routes/GuestRoute';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 import { routes } from './routes/routes';
+import UserDetails from './pages/Users/UserDetails';
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
             <Route path={routes.dashboard.home} element={<Home />} />
 
             <Route path={routes.users.index} element={<Users />} />
+            <Route path={routes.users.showPattern} element={<UserDetails />} />
 
             <Route path={routes.roles.index} element={<Roles />} />
 

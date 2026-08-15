@@ -7,7 +7,6 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  PlugInIcon,
   BoxCubeIcon,
   UserCircleIcon,
 } from '../icons';
@@ -27,6 +26,9 @@ const navItems: NavItem[] = [
     path: routes.dashboard.home,
     // subItems: [{ name: 'Dashboard', path: '/', pro: false }],
   },
+];
+
+const administrationItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: 'Users',
@@ -40,16 +42,16 @@ const navItems: NavItem[] = [
 ];
 
 const othersItems: NavItem[] = [
-  {
-    icon: <UserCircleIcon />,
-    name: 'My Profile',
-    path: '/profile',
-  },
-  {
-    icon: <PlugInIcon />,
-    name: 'Settings',
-    path: '/settings',
-  },
+  // {
+  //   icon: <UserCircleIcon />,
+  //   name: 'My Profile',
+  //   path: '/profile',
+  // },
+  // {
+  //   icon: <PlugInIcon />,
+  //   name: 'Settings',
+  //   path: '/settings',
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -57,7 +59,7 @@ const AppSidebar: React.FC = () => {
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: 'main' | 'others';
+    type: 'main' | 'administration' | 'others';
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
@@ -107,7 +109,10 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: 'main' | 'others') => {
+  const handleSubmenuToggle = (
+    index: number,
+    menuType: 'main' | 'administration' | 'others',
+  ) => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
         prevOpenSubmenu &&
@@ -120,7 +125,10 @@ const AppSidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (items: NavItem[], menuType: 'main' | 'others') => (
+  const renderMenuItems = (
+    items: NavItem[],
+    menuType: 'main' | 'administration' | 'others',
+  ) => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => (
         <li key={nav.name}>
@@ -319,12 +327,12 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  'Others'
+                  'Administration'
                 ) : (
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(othersItems, 'others')}
+              {renderMenuItems(administrationItems, 'administration')}
             </div>
           </div>
         </nav>

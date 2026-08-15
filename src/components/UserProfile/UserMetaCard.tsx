@@ -2,6 +2,8 @@ import { ChangeEvent, useRef, useState } from 'react';
 
 import { useAuth } from '../../auth/useAuth';
 import { authService } from '../../auth/authService';
+import { userStatusColors, userStatusLabels } from '../../types/user';
+import Badge from '../ui/badge/Badge';
 
 export default function UserMetaCard() {
   const { user, refreshUser } = useAuth();
@@ -17,7 +19,13 @@ export default function UserMetaCard() {
 
   const displayName = user.full_name || `${user.first_name} ${user.last_name}`;
 
-  const avatarUrl = user.avatar || '/images/user/owner.jpg';
+  const avatarUrl = user.avatar;
+
+  const initials =
+    `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+
+  const userStatusKey = (user.status ??
+    'active') as keyof typeof userStatusColors;
 
   function handleAvatarClick() {
     if (!isUploading) {
@@ -27,8 +35,6 @@ export default function UserMetaCard() {
 
   async function handleAvatarChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-
-    // event.target.value = '';
 
     if (!file) {
       return;
@@ -86,14 +92,20 @@ export default function UserMetaCard() {
               type="button"
               onClick={handleAvatarClick}
               disabled={isUploading}
-              className="relative block w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 disabled:cursor-not-allowed"
+              className="relative block w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 text-xl font-semibold text-blue-600 disabled:cursor-not-allowed"
               aria-label="Change profile picture"
             >
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                className="h-full w-full object-cover"
-              />
+              {/* <span className="h-32 w-32 items-center rounded-full bg-brand-500 font-semibold text-white"> */}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initials
+              )}
+              {/* </span> */}
 
               {isUploading && (
                 <span className="absolute inset-0 flex items-center justify-center bg-black/50">
@@ -155,7 +167,9 @@ export default function UserMetaCard() {
               <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block" />
 
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {user.status}
+                <Badge size="sm" color={userStatusColors[userStatusKey]}>
+                  {userStatusLabels[userStatusKey]}
+                </Badge>
               </p>
             </div>
 
