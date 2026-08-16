@@ -19,6 +19,7 @@ export const usersApi = {
           search: params.search || undefined,
           sort: params.sort,
           direction: params.direction,
+          trashed: params.trashed,
         },
       },
     );
@@ -50,5 +51,22 @@ export const usersApi = {
     }>(`${endpoints.users.index}/${id}`, payload);
 
     return response.data.data;
+  },
+
+  async delete(id: string): Promise<void> {
+    await apiClient.delete(`${endpoints.users.index}/${id}`);
+  },
+
+  async restore(id: string): Promise<User> {
+    const response = await apiClient.patch<{
+      data: User;
+      errors: unknown;
+    }>(`${endpoints.users.index}/${id}/restore`);
+
+    return response.data.data;
+  },
+
+  async forceDelete(id: string): Promise<void> {
+    await apiClient.delete(`${endpoints.users.index}/${id}/force`);
   },
 };
