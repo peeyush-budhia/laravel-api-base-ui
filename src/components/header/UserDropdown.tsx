@@ -63,7 +63,7 @@ export default function UserDropdown() {
             <img
               src={user.avatar}
               alt={displayName}
-              className="h-full w-full object-cover"
+              className="h-full w-full rounded-full object-cover"
             />
           ) : (
             initials

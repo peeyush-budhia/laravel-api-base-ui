@@ -25,6 +25,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 
 import { routes } from './routes/routes';
 import UserDetails from './pages/Users/UserDetails';
+import UserEdit from './pages/Users/UserEdit';
 
 export default function App() {
   return (
@@ -56,6 +57,7 @@ export default function App() {
 
             <Route path={routes.users.index} element={<Users />} />
             <Route path={routes.users.create} element={<UserCreate />} />
+            <Route path={routes.users.editPattern} element={<UserEdit />} />
             <Route path={routes.users.showPattern} element={<UserDetails />} />
 
             <Route path={routes.roles.index} element={<Roles />} />

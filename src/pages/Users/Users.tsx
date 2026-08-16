@@ -7,6 +7,7 @@ import {
 } from '../../types/user';
 import { useAuth } from '../../auth/useAuth';
 import { permissions } from '../../auth/permissions';
+
 import {
   Table,
   TableBody,
@@ -14,10 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
+
 import Badge from '../../components/ui/badge/Badge';
 import PageMeta from '../../components/common/PageMeta';
+
+import { Dropdown } from '../../components/ui/dropdown/Dropdown';
+import { DropdownItem } from '../../components/ui/dropdown/DropdownItem';
+
 import { Link } from 'react-router';
 import { routes } from '../../routes/routes';
+import { MoreDotIcon } from '../../icons';
 
 const PER_PAGE = 15;
 
@@ -58,15 +65,14 @@ export default function Users() {
   const [sort, setSort] = useState('first_name');
   const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
 
+  const [openActionUserId, setOpenActionUserId] = useState<string | null>(null);
+
   const { can } = useAuth();
 
   const canViewUsers = can(permissions.usersView);
   const canCreateUsers = can(permissions.usersCreate);
-  useEffect(() => {
-    if (!canViewUsers) {
-      return;
-    }
-  }, [canViewUsers]);
+  const canUpdateUsers = can(permissions.usersUpdate);
+
   const [meta, setMeta] = useState({
     current_page: 1,
     per_page: PER_PAGE,
@@ -287,6 +293,13 @@ export default function Users() {
                       >
                         Last Login
                       </TableCell>
+
+                      <TableCell
+                        isHeader
+                        className="px-5 py-4 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                      >
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHeader>
 
@@ -345,6 +358,61 @@ export default function Users() {
 
                           <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                             {formatDate(user.last_login_at)}
+                          </TableCell>
+
+                          <TableCell className="px-5 py-4">
+                            <div className="relative flex">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenActionUserId((current) =>
+                                    current === user.id ? null : user.id,
+                                  )
+                                }
+                                className="dropdown-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+                                aria-label={`Actions for ${user.full_name}`}
+                                aria-expanded={openActionUserId === user.id}
+                                aria-haspopup="menu"
+                              >
+                                <MoreDotIcon />
+                              </button>
+
+                              <Dropdown
+                                isOpen={openActionUserId === user.id}
+                                onClose={() => setOpenActionUserId(null)}
+                                className="w-36 p-1"
+                              >
+                                <ul className="flex flex-col gap-1">
+                                  <li>
+                                    <DropdownItem
+                                      tag="a"
+                                      to={routes.users.show(user.id)}
+                                      onItemClick={() =>
+                                        setOpenActionUserId(null)
+                                      }
+                                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+                                    >
+                                      View
+                                    </DropdownItem>
+                                  </li>
+
+                                  {canUpdateUsers && (
+                                    <li>
+                                      <DropdownItem
+                                        tag="a"
+                                        to={routes.users.edit(user.id)}
+                                        onItemClick={() =>
+                                          setOpenActionUserId(null)
+                                        }
+                                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+                                      >
+                                        Edit
+                                      </DropdownItem>
+                                    </li>
+                                  )}
+                                </ul>
+                              </Dropdown>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

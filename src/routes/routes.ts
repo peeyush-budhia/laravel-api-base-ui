@@ -20,6 +20,7 @@ export const routes = {
     show: (id: string) => `/users/${id}`,
     showPattern: '/users/:id',
     edit: (id: string) => `/users/${id}/edit`,
+    editPattern: '/users/:id/edit',
   },
 
   roles: {
