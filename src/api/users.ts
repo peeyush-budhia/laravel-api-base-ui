@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import { endpoints } from './endpoints';
 import type {
   CreateUserPayload,
+  UpdateUserPayload,
   User,
   UserListParams,
   UserListResponse,
@@ -38,6 +39,15 @@ export const usersApi = {
       data: User;
       errors: unknown;
     }>(endpoints.users.index, payload);
+
+    return response.data.data;
+  },
+
+  async update(id: string, payload: UpdateUserPayload): Promise<User> {
+    const response = await apiClient.patch<{
+      data: User;
+      errors: unknown;
+    }>(`${endpoints.users.index}/${id}`, payload);
 
     return response.data.data;
   },
