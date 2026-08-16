@@ -68,6 +68,8 @@ export default function UserDetails() {
   const { can } = useAuth();
 
   const canViewUsers = can(permissions.usersView);
+  const canUpdateUsers = can(permissions.usersUpdate);
+
   useEffect(() => {
     if (!id || !canViewUsers) {
       return;
@@ -122,7 +124,7 @@ export default function UserDetails() {
       />
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
               User Details
@@ -133,12 +135,23 @@ export default function UserDetails() {
             </p>
           </div>
 
-          <Link
-            to="/users"
-            className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
-          >
-            ← Back to Users
-          </Link>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {canUpdateUsers && user && (
+              <Link
+                to={routes.users.edit(user.id)}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+              >
+                Edit User
+              </Link>
+            )}
+
+            <Link
+              to="/users"
+              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
+            >
+              ← Back to Users
+            </Link>
+          </div>
         </div>
 
         {isLoading && (

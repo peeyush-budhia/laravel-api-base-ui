@@ -70,3 +70,11 @@ export interface CreateUserPayload {
   role: string;
   status: UserStatus;
 }
+
+export interface UpdateUserPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  status: UserStatus;
+}
