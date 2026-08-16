@@ -6,8 +6,11 @@ import {
   userStatusLabels,
   type User,
 } from '../../types/user';
+import { useAuth } from '../../auth/useAuth';
+import { permissions } from '../../auth/permissions';
 import PageMeta from '../../components/common/PageMeta';
 import Badge from '../../components/ui/badge/Badge';
+import { routes } from '../../routes/routes';
 
 function formatDate(value: string | null): string {
   if (!value) {
@@ -62,9 +65,11 @@ export default function UserDetails() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const { can } = useAuth();
 
+  const canViewUsers = can(permissions.usersView);
   useEffect(() => {
-    if (!id) {
+    if (!id || !canViewUsers) {
       return;
     }
 
@@ -84,8 +89,31 @@ export default function UserDetails() {
     };
 
     void loadUser();
-  }, [id]);
+  }, [id, canViewUsers]);
+  if (!canViewUsers) {
+    return (
+      <>
+        <PageMeta title="User Details" description="View user details" />
 
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+            Access Denied
+          </h1>
+
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            You do not have permission to view user details.
+          </p>
+
+          <Link
+            to={routes.users.index}
+            className="mt-4 inline-flex rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white"
+          >
+            Back to Users
+          </Link>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <PageMeta

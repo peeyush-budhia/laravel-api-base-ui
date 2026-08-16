@@ -1,9 +1,9 @@
 export const routes = {
   auth: {
     signIn: '/signin',
-    signUp: '/signup',
     forgotPassword: '/forgot-password',
     resetPassword: '/reset-password',
+    changePassword: '/change-password',
   },
 
   dashboard: {

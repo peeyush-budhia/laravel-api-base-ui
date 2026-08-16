@@ -7,6 +7,7 @@ import type {
   LoginData,
   UpdateProfileData,
   ResetPasswordData,
+  ChangePasswordData,
 } from './types';
 
 export const authService = {
@@ -65,5 +66,9 @@ export const authService = {
 
   async resetPassword(data: ResetPasswordData): Promise<void> {
     await apiClient.post<ApiResponse>(endpoints.auth.resetPassword, data);
+  },
+
+  async changePassword(data: ChangePasswordData): Promise<void> {
+    await apiClient.post(endpoints.auth.changePassword, data);
   },
 };

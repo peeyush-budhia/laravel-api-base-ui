@@ -5,7 +5,8 @@ import {
   userStatusLabels,
   type User,
 } from '../../types/user';
-
+import { useAuth } from '../../auth/useAuth';
+import { permissions } from '../../auth/permissions';
 import {
   Table,
   TableBody,
@@ -57,6 +58,15 @@ export default function Users() {
   const [sort, setSort] = useState('first_name');
   const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
 
+  const { can } = useAuth();
+
+  const canViewUsers = can(permissions.usersView);
+  const canCreateUsers = can(permissions.usersCreate);
+  useEffect(() => {
+    if (!canViewUsers) {
+      return;
+    }
+  }, [canViewUsers]);
   const [meta, setMeta] = useState({
     current_page: 1,
     per_page: PER_PAGE,
@@ -129,6 +139,24 @@ export default function Users() {
     setDirection('asc');
   }
 
+  if (!canViewUsers) {
+    return (
+      <>
+        <PageMeta title="Users" description="Manage application users" />
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+            Access Denied
+          </h1>
+
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            You do not have permission to view users.
+          </p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <PageMeta title="Users" description="Manage application users" />
@@ -145,13 +173,14 @@ export default function Users() {
             </p>
           </div>
 
-          <button
-            type="button"
-            disabled
-            className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white opacity-50 shadow-theme-xs"
-          >
-            Add User
-          </button>
+          {canCreateUsers && (
+            <Link
+              to={routes.users.create}
+              className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+            >
+              Add User
+            </Link>
+          )}
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">

@@ -3,6 +3,7 @@ import { AuthContext } from './context';
 import { authService } from './authService';
 import { tokenStorage } from './token';
 import type { AuthUser, LoginCredentials } from './types';
+import type { Permission } from './permissions';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -56,7 +57,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
     }
   }, []);
-
+  const can = useCallback(
+    (permission: Permission): boolean => {
+      return user?.permissions.includes(permission) ?? false;
+    },
+    [user],
+  );
   return (
     <AuthContext.Provider
       value={{
@@ -66,6 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         login,
         logout,
         refreshUser,
+        can,
       }}
     >
       {children}
