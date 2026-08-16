@@ -23,7 +23,9 @@ export interface User {
   email: string;
   avatar: string | null;
   role: string | null;
+  permissions: string[];
   status: UserStatus;
+  must_change_password: boolean;
   email_verified_at: string | null;
   last_login_at: string | null;
   created_at: string | null;
@@ -67,6 +69,4 @@ export interface CreateUserPayload {
   email: string;
   role: string;
   status: UserStatus;
-  password: string;
-  password_confirmation: string;
 }

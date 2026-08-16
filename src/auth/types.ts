@@ -1,3 +1,4 @@
+import type { Permission } from './permissions';
 export interface AuthUser {
   id: string;
   first_name: string;
@@ -6,7 +7,9 @@ export interface AuthUser {
   email: string;
   avatar: string | null;
   role: string | null;
+  permissions: string[];
   status: string;
+  must_change_password: boolean;
   email_verified_at: string | null;
   last_login_at: string | null;
   created_at: string;
@@ -32,6 +35,7 @@ export interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  can: (permission: Permission) => boolean;
 }
 
 export interface UpdateProfileData {
@@ -43,6 +47,12 @@ export interface UpdateProfileData {
 export interface ResetPasswordData {
   token: string;
   email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface ChangePasswordData {
+  current_password: string;
   password: string;
   password_confirmation: string;
 }
