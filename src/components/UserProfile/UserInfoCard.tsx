@@ -8,6 +8,7 @@ import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
+import Badge from '../ui/badge/Badge';
 
 interface FieldErrors {
   first_name?: string[];
@@ -138,7 +139,11 @@ export default function UserInfoCard() {
                 Role
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {user.role ?? '—'}
+                {user.role && (
+                  <Badge size="sm" color="info">
+                    {user.role}
+                  </Badge>
+                )}
               </p>
             </div>
           </div>

@@ -4,18 +4,21 @@ import { ScrollToTop } from './components/common/ScrollToTop';
 import AppLayout from './layout/AppLayout';
 
 import SignIn from './pages/AuthPages/SignIn';
-import SignUp from './pages/AuthPages/SignUp';
 import ForgotPassword from './pages/AuthPages/ForgotPassword';
 import ResetPassword from './pages/AuthPages/ResetPassword';
+import ChangePassword from './pages/AuthPages/ChangePassword';
 
 import Home from './pages/Dashboard/Home';
 import GuestNotFound from './pages/OtherPage/GuestNotFound';
 import ProtectedNotFound from './pages/OtherPage/ProtectedNotFound';
 
 import Users from './pages/Users/Users';
-import Roles from './pages/Roles/Roles';
-import Settings from './pages/Settings/Settings';
 import UserProfiles from './pages/UserProfiles';
+import UserCreate from './pages/Users/UserCreate';
+
+import Roles from './pages/Roles/Roles';
+
+import Settings from './pages/Settings/Settings';
 
 import GuestRoute from './routes/GuestRoute';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -33,8 +36,6 @@ export default function App() {
         <Route element={<GuestRoute />}>
           <Route path={routes.auth.signIn} element={<SignIn />} />
 
-          <Route path={routes.auth.signUp} element={<SignUp />} />
-
           <Route
             path={routes.auth.forgotPassword}
             element={<ForgotPassword />}
@@ -45,10 +46,16 @@ export default function App() {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
+          <Route
+            path={routes.auth.changePassword}
+            element={<ChangePassword />}
+          />
+
           <Route element={<AppLayout />}>
             <Route path={routes.dashboard.home} element={<Home />} />
 
             <Route path={routes.users.index} element={<Users />} />
+            <Route path={routes.users.create} element={<UserCreate />} />
             <Route path={routes.users.showPattern} element={<UserDetails />} />
 
             <Route path={routes.roles.index} element={<Roles />} />
@@ -57,7 +64,6 @@ export default function App() {
 
             <Route path={routes.profile.index} element={<UserProfiles />} />
 
-            {/* Protected 404 */}
             <Route path="*" element={<ProtectedNotFound />} />
           </Route>
         </Route>

@@ -5,6 +5,7 @@ export const endpoints = {
     me: '/auth/me',
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
+    changePassword: '/auth/change-password',
     profile: '/profile',
     profileAvatar: '/profile/avatar',
   },
