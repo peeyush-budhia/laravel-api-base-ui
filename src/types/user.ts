@@ -1,5 +1,4 @@
 export type UserStatus = 'active' | 'inactive' | 'suspended';
-
 export const userStatusLabels: Record<UserStatus, string> = {
   active: 'Active',
   inactive: 'Inactive',
@@ -13,6 +12,13 @@ export const userStatusColors: Record<
   active: 'success',
   inactive: 'warning',
   suspended: 'error',
+};
+
+export type UserTrashedFilter = 'without' | 'with' | 'only';
+export const userTrashedFilterLabels: Record<UserTrashedFilter, string> = {
+  without: 'Active Users',
+  with: 'All Users',
+  only: 'Deleted Users',
 };
 
 export interface User {
@@ -55,6 +61,7 @@ export interface UserListParams {
   search?: string;
   sort?: string;
   direction?: 'asc' | 'desc';
+  trashed?: UserTrashedFilter;
 }
 
 export interface UserListResponse {
