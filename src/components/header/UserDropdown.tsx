@@ -44,9 +44,6 @@ export default function UserDropdown() {
 
   const displayName = user.full_name || `${user.first_name} ${user.last_name}`;
 
-  const initials =
-    `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
-
   const role = user.role || 'No role assigned';
 
   return (
@@ -66,7 +63,9 @@ export default function UserDropdown() {
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
-            initials
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-500 dark:bg-brand-500/15 dark:text-brand-400">
+              {user.full_name.charAt(0).toUpperCase()}
+            </div>
           )}
         </span>
 
