@@ -22,6 +22,12 @@ export default function UserActions({
   onRestore,
   onForceDelete,
 }: UserActionsProps) {
+  const isSuperAdmin = user.role === 'super-admin';
+
+  if (isSuperAdmin) {
+    return null;
+  }
+
   const items: ActionItem[] = [
     ...(canView && !user.deleted_at
       ? [
@@ -65,6 +71,10 @@ export default function UserActions({
         ]
       : []),
   ];
+
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <ActionsDropdown
