@@ -1,11 +1,4 @@
-interface PaginationMeta {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-  from: number | null;
-  to: number | null;
-}
+import type { PaginationMeta } from '../../types/pagination';
 
 interface PaginationProps {
   meta: PaginationMeta;

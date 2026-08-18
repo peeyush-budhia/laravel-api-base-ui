@@ -1,18 +1,37 @@
+import type { PaginatedResponse } from './pagination';
+
 export interface Role {
-  id: number | string;
+  id: string;
   name: string;
   guard_name: string;
   created_at: string | null;
   updated_at: string | null;
 }
 
-export interface RoleListResponse {
-  data: Role[];
+export interface Permission {
+  id: string;
+  name: string;
+  guard_name: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface RoleListParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  sort?: string;
+  direction?: 'asc' | 'desc';
+}
+
+export type RoleListResponse = PaginatedResponse<Role>;
+
+export interface RoleResponse {
+  data: Role;
   errors: unknown;
-  meta: {
-    current_page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
+}
+
+export interface RolePermissionsResponse {
+  data: Permission[];
+  errors: unknown;
 }

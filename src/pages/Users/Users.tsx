@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { usersApi } from '../../api/users';
 
 import { type User, type UserTrashedFilter } from '../../types/user';
+import type { PaginationMeta } from '../../types/pagination';
 
 import { useAuth } from '../../auth/useAuth';
 import { permissions } from '../../auth/permissions';
@@ -51,13 +52,20 @@ export default function Users() {
   const canUpdateUsers = can(permissions.usersUpdate);
   const canDeleteUsers = can(permissions.usersDelete);
 
-  const [meta, setMeta] = useState({
+  const [meta, setMeta] = useState<PaginationMeta>({
     current_page: 1,
     per_page: PER_PAGE,
     total: 0,
     last_page: 1,
-    from: null as number | null,
-    to: null as number | null,
+    from: null,
+    to: null,
+    path: '',
+    links: {
+      first: null,
+      last: null,
+      prev: null,
+      next: null,
+    },
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -79,14 +87,7 @@ export default function Users() {
 
       setUsers(response.data);
 
-      setMeta({
-        current_page: response.meta.current_page,
-        per_page: response.meta.per_page,
-        total: response.meta.total,
-        last_page: response.meta.last_page,
-        from: response.meta.from,
-        to: response.meta.to,
-      });
+      setMeta(response.meta);
     } catch {
       setUsers([]);
       setError('Unable to load users. Please try again.');
