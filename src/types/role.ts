@@ -11,6 +11,7 @@ export interface Role {
 export interface Permission {
   id: string;
   name: string;
+  description: string;
   guard_name: string;
   created_at: string | null;
   updated_at: string | null;
@@ -32,6 +33,11 @@ export interface RoleResponse {
 }
 
 export interface RolePermissionsResponse {
+  data: Permission[];
+  errors: unknown;
+}
+
+export interface PermissionListResponse {
   data: Permission[];
   errors: unknown;
 }

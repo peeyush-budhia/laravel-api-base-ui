@@ -2,8 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { usersApi } from '../../api/users';
-
 import { type User, type UserTrashedFilter } from '../../types/user';
+import UserFilters from '../../components/users/UserFilters';
+import UserTable from '../../components/users/UserTable';
+import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
+
+import Pagination from '../../components/common/Pagination';
 import type { PaginationMeta } from '../../types/pagination';
 
 import { useAuth } from '../../auth/useAuth';
@@ -12,11 +16,6 @@ import { permissions } from '../../auth/permissions';
 import PageMeta from '../../components/common/PageMeta';
 
 import { routes } from '../../routes/routes';
-
-import UserFilters from '../../components/Users/UserFilters';
-import UserTable from '../../components/Users/UserTable';
-import Pagination from '../../components/common/Pagination';
-import UserActionConfirmationModal from '../../components/Users/UserActionConfirmationModal';
 
 const PER_PAGE = 15;
 

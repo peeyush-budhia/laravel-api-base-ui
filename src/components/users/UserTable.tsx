@@ -21,6 +21,7 @@ import { routes } from '../../routes/routes';
 import UserAvatar from './UserAvatar';
 import UserActions from './UserActions';
 
+import { formatDateTime } from '../../utils/dateTimeUtils';
 interface UserTableProps {
   users: User[];
   isLoading: boolean;
@@ -39,17 +40,6 @@ interface UserTableProps {
   onDelete: (user: User) => void;
   onRestore: (user: User) => void;
   onForceDelete: (user: User) => void;
-}
-
-function formatDate(value: string | null): string {
-  if (!value) {
-    return 'Never';
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
 }
 
 function LoadingRows() {
@@ -194,7 +184,13 @@ export default function UserTable({
                 </TableCell>
 
                 <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                  {user.role ?? '—'}
+                  {user.role ? (
+                    <Badge size="sm" color="info">
+                      {user.role}
+                    </Badge>
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
 
                 <TableCell className="px-5 py-4">
@@ -215,8 +211,8 @@ export default function UserTable({
 
                 <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {trashed === 'only'
-                    ? formatDate(user.deleted_at)
-                    : formatDate(user.last_login_at)}
+                    ? formatDateTime(user.deleted_at)
+                    : formatDateTime(user.last_login_at)}
                 </TableCell>
 
                 <TableCell className="px-5 py-4 text-end">

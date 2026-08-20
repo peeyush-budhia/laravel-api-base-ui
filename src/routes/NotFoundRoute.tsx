@@ -1,7 +1,7 @@
 import { useAuth } from '../auth/useAuth';
 
-import GuestNotFound from '../pages/OtherPage/GuestNotFound';
-import ProtectedNotFound from '../pages/OtherPage/ProtectedNotFound';
+import GuestNotFound from '../pages/others/GuestNotFound';
+import ProtectedNotFound from '../pages/others/ProtectedNotFound';
 
 export default function NotFoundRoute() {
   const { user, isLoading } = useAuth();

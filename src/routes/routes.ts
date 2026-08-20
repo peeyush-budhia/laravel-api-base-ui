@@ -27,7 +27,11 @@ export const routes = {
     index: '/roles',
     create: '/roles/create',
     show: (id: string) => `/roles/${id}`,
+    showPattern: '/roles/:id',
     edit: (id: string) => `/roles/${id}/edit`,
+    editPattern: '/roles/:id/edit',
+    permissions: (id: string) => `/roles/${id}/permissions`,
+    permissionsPattern: '/roles/:id/permissions',
   },
 
   settings: {

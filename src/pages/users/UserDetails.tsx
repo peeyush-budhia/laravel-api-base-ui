@@ -12,16 +12,7 @@ import PageMeta from '../../components/common/PageMeta';
 import Badge from '../../components/ui/badge/Badge';
 import { routes } from '../../routes/routes';
 
-function formatDate(value: string | null): string {
-  if (!value) {
-    return 'Never';
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
+import { formatDateTime } from '../../utils/dateTimeUtils';
 
 function UserAvatar({ user }: { user: User }) {
   if (user.avatar) {
@@ -271,17 +262,17 @@ export default function UserDetails() {
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <DetailItem
                   label="Last Login"
-                  value={formatDate(user.last_login_at)}
+                  value={formatDateTime(user.last_login_at)}
                 />
 
                 <DetailItem
                   label="Created"
-                  value={formatDate(user.created_at)}
+                  value={formatDateTime(user.created_at)}
                 />
 
                 <DetailItem
                   label="Updated"
-                  value={formatDate(user.updated_at)}
+                  value={formatDateTime(user.updated_at)}
                 />
               </div>
             </div>

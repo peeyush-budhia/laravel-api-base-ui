@@ -259,6 +259,24 @@ export default function UserInfoCard() {
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
+
+            <Button
+              size="sm"
+              onClick={() => void handleSave()}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                    aria-hidden="true"
+                  />
+                  Saving...
+                </span>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
           </div>
         </div>
       </Modal>
