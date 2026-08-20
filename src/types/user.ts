@@ -1,3 +1,5 @@
+import { PaginatedResponse } from './pagination';
+
 export type UserStatus = 'active' | 'inactive' | 'suspended';
 export const userStatusLabels: Record<UserStatus, string> = {
   active: 'Active',
@@ -38,23 +40,6 @@ export interface User {
   updated_at: string | null;
   deleted_at: string | null;
 }
-
-export interface PaginationMeta {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-  from: number | null;
-  to: number | null;
-  path: string;
-  links: {
-    first: string | null;
-    last: string | null;
-    prev: string | null;
-    next: string | null;
-  };
-}
-
 export interface UserListParams {
   page?: number;
   perPage?: number;
@@ -64,12 +49,7 @@ export interface UserListParams {
   trashed?: UserTrashedFilter;
 }
 
-export interface UserListResponse {
-  data: User[];
-  errors: unknown;
-  meta: PaginationMeta;
-}
-
+export type UserListResponse = PaginatedResponse<User>;
 export interface CreateUserPayload {
   first_name: string;
   last_name: string;

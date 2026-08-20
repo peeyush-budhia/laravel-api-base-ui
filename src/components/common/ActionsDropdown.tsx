@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
@@ -26,6 +26,7 @@ export default function ActionsDropdown({
   className = 'w-44 p-1',
 }: ActionsDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   function closeActions() {
     setIsOpen(false);
@@ -54,9 +55,10 @@ export default function ActionsDropdown({
   return (
     <div className="relative inline-block">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="dropdown-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        className="dropdown-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover hover dark dark:hover/5 dark:hover"
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="menu"
@@ -64,7 +66,12 @@ export default function ActionsDropdown({
         <MoreDotIcon />
       </button>
 
-      <Dropdown isOpen={isOpen} onClose={closeActions} className={className}>
+      <Dropdown
+        isOpen={isOpen}
+        onClose={closeActions}
+        className={className}
+        triggerRef={triggerRef}
+      >
         <ul className="flex flex-col gap-1">
           {items.map((item) => (
             <li key={item.label}>
