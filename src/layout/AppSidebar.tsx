@@ -283,7 +283,7 @@ const AppSidebar: React.FC = () => {
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/laravel-api-base-horizontal.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -291,10 +291,10 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/laravel-api-base-stacked.png"
               alt="Logo"
-              width={32}
-              height={32}
+              width={64}
+              height={64}
             />
           )}
         </Link>

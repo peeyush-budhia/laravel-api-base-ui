@@ -2,6 +2,7 @@ import ActionsDropdown, { type ActionItem } from '../common/ActionsDropdown';
 
 import { routes } from '../../routes/routes';
 import type { User } from '../../types/user';
+import { SUPER_ADMIN_ROLE } from '../../constants/roles';
 
 interface UserActionsProps {
   user: User;
@@ -22,7 +23,7 @@ export default function UserActions({
   onRestore,
   onForceDelete,
 }: UserActionsProps) {
-  const isSuperAdmin = user.role === 'super-admin';
+  const isSuperAdmin = user.role === SUPER_ADMIN_ROLE;
 
   if (isSuperAdmin) {
     return null;

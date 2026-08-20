@@ -45,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     const data = await authService.login(credentials);
 
-    tokenStorage.set(data.token, credentials.rememberMe);
+    tokenStorage.set(data.token);
     setUser(data.user);
   }, []);
 
@@ -63,6 +63,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
     [user],
   );
+
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      if (event.key !== 'access_token') {
+        return;
+      }
+
+      if (event.newValue === null) {
+        setUser(null);
+
+        return;
+      }
+
+      void refreshUser();
+    }
+
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [refreshUser]);
+
   return (
     <AuthContext.Provider
       value={{

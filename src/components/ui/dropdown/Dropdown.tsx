@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface DropdownProps {
@@ -7,44 +7,75 @@ interface DropdownProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  triggerRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface DropdownPosition {
   top: number;
-  right: number;
+  left: number;
+  visibility: 'hidden' | 'visible';
 }
+
+const DROPDOWN_GAP = 8;
+const VIEWPORT_PADDING = 8;
 
 export const Dropdown: React.FC<DropdownProps> = ({
   isOpen,
   onClose,
   children,
   className = '',
+  triggerRef,
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [position, setPosition] = useState<DropdownPosition>({
     top: 0,
-    right: 8,
+    left: 0,
+    visibility: 'hidden',
   });
 
-  function updatePosition() {
-    const trigger = document.querySelector(
-      '.dropdown-toggle[aria-expanded="true"]',
-    );
+  const updatePosition = useCallback(() => {
+    const trigger = triggerRef?.current;
+    const dropdown = dropdownRef.current;
 
-    if (!(trigger instanceof HTMLElement)) {
+    if (!trigger || !dropdown) {
       return;
     }
 
-    const rect = trigger.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const dropdownRect = dropdown.getBoundingClientRect();
+
+    const menuWidth = dropdownRect.width;
+    const menuHeight = dropdownRect.height;
+
+    const spaceAbove = triggerRect.top;
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+
+    const shouldOpenUpward =
+      spaceBelow < menuHeight + DROPDOWN_GAP &&
+      spaceAbove >= menuHeight + DROPDOWN_GAP;
+
+    const top = shouldOpenUpward
+      ? triggerRect.top - menuHeight - DROPDOWN_GAP
+      : triggerRect.bottom + DROPDOWN_GAP;
+
+    const preferredLeft = triggerRect.right - menuWidth;
+
+    const maxLeft = window.innerWidth - menuWidth - VIEWPORT_PADDING;
+
+    const left = Math.min(
+      Math.max(preferredLeft, VIEWPORT_PADDING),
+      Math.max(maxLeft, VIEWPORT_PADDING),
+    );
 
     setPosition({
-      top: rect.bottom + 8,
-      right: Math.max(window.innerWidth - rect.right, 8),
+      top: Math.max(top, VIEWPORT_PADDING),
+      left,
+      visibility: 'visible',
     });
-  }
+  }, [triggerRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       return;
     }
@@ -56,9 +87,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
     return () => {
       window.cancelAnimationFrame(animationFrame);
     };
-  }, [isOpen]);
+  }, [isOpen, updatePosition]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       return;
     }
@@ -78,9 +109,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [isOpen]);
+  }, [isOpen, updatePosition]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       return;
     }
@@ -96,7 +127,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         return;
       }
 
-      if (target instanceof HTMLElement && target.closest('.dropdown-toggle')) {
+      if (triggerRef?.current?.contains(target)) {
         return;
       }
 
@@ -108,7 +139,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, triggerRef]);
 
   if (!isOpen) {
     return null;
@@ -120,7 +151,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
       className={`fixed z-[99999] rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
       style={{
         top: position.top,
-        right: position.right,
+        left: position.left,
+        visibility: position.visibility,
       }}
     >
       {children}

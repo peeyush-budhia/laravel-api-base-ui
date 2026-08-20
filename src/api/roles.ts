@@ -1,18 +1,102 @@
 import { apiClient } from './client';
 import { endpoints } from './endpoints';
-import type { RoleListResponse } from '../types/role';
+
+import type {
+  Permission,
+  Role,
+  RoleListParams,
+  RoleListResponse,
+  RolePermissionsResponse,
+  RoleResponse,
+} from '../types/role';
+
+export interface UpdateRoleData {
+  name: string;
+}
 
 export const rolesApi = {
-  async list(): Promise<RoleListResponse> {
+  async list(params: RoleListParams = {}): Promise<RoleListResponse> {
     const response = await apiClient.get<RoleListResponse>(
       endpoints.roles.index,
       {
         params: {
-          per_page: 100,
+          page: params.page,
+          per_page: params.perPage,
+          search: params.search || undefined,
+          sort: params.sort,
+          direction: params.direction,
         },
       },
     );
 
     return response.data;
+  },
+
+  async show(id: string): Promise<Role> {
+    const response = await apiClient.get<RoleResponse>(
+      `${endpoints.roles.index}/${id}`,
+    );
+
+    return response.data.data;
+  },
+
+  async allPermissions(): Promise<Permission[]> {
+    const response = await apiClient.get<RolePermissionsResponse>(
+      `${endpoints.roles.index}/permissions`,
+    );
+
+    return response.data.data;
+  },
+
+  async create(data: { name: string }): Promise<Role> {
+    const response = await apiClient.post<RoleResponse>(
+      endpoints.roles.index,
+      data,
+    );
+
+    return response.data.data;
+  },
+
+  /**
+   * Update role details.
+   *
+   * Permissions are intentionally NOT included here.
+   * Permission changes use syncPermissions().
+   */
+  async update(id: string, data: UpdateRoleData): Promise<Role> {
+    const response = await apiClient.put<RoleResponse>(
+      `${endpoints.roles.index}/${id}`,
+      data,
+    );
+
+    return response.data.data;
+  },
+
+  async remove(id: string): Promise<void> {
+    await apiClient.delete(`${endpoints.roles.index}/${id}`);
+  },
+
+  async permissions(id: string): Promise<Permission[]> {
+    const response = await apiClient.get<RolePermissionsResponse>(
+      `${endpoints.roles.index}/${id}/permissions`,
+    );
+
+    return response.data.data;
+  },
+
+  /**
+   * Synchronize permissions assigned to a role.
+   *
+   * Requires roles.manage-permissions on the backend.
+   */
+  async syncPermissions(id: string, permissions: string[]): Promise<Role> {
+    const response = await apiClient.put<RoleResponse>(
+      `${endpoints.roles.index}/${id}/permissions`,
+      {
+        permissions,
+      },
+    );
+
+    return response.data.data;
   },
 };

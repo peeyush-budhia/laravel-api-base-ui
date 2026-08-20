@@ -167,9 +167,20 @@ export default function ChangePassword() {
                 <Button
                   type="submit"
                   className="w-full"
+                  size="sm"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Updating Password...' : 'Update Password'}
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                        aria-hidden="true"
+                      />
+                      Updating Password...
+                    </span>
+                  ) : (
+                    'Update Password'
+                  )}
                 </Button>
               </div>
             </form>

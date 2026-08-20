@@ -203,7 +203,17 @@ export default function SignInForm() {
                     size="sm"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Signing in...' : 'Sign in'}
+                    {isSubmitting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                          aria-hidden="true"
+                        />
+                        Signing in...
+                      </span>
+                    ) : (
+                      'Sign in'
+                    )}
                   </Button>
                 </div>
               </div>

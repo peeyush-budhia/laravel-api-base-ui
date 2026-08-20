@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useAuth } from '../../auth/useAuth';
@@ -13,6 +13,7 @@ export default function UserDropdown() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   function toggleDropdown() {
     setIsOpen((value) => !value);
@@ -49,6 +50,7 @@ export default function UserDropdown() {
   return (
     <div className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
@@ -97,6 +99,7 @@ export default function UserDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
+        triggerRef={triggerRef}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
@@ -108,7 +111,7 @@ export default function UserDropdown() {
             {user.email}
           </span>
 
-          <span className="mt-1 block text-theme-xs capitalize text-gray-500 dark:text-gray-400">
+          <span className="mt-1 block text-theme-xs text-gray-500 dark:text-gray-400">
             {role}
           </span>
         </div>

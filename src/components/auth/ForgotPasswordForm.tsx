@@ -149,7 +149,17 @@ export default function ForgotPasswordForm() {
                   size="sm"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                        aria-hidden="true"
+                      />
+                      Sending...
+                    </span>
+                  ) : (
+                    'Send Reset Link'
+                  )}
                 </Button>
               </div>
             </div>
