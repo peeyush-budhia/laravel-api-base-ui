@@ -253,7 +253,9 @@ export default function RoleEdit() {
        * Synchronize permissions only when authorized.
        */
       if (canManageRolePermissions) {
-        await rolesApi.syncPermissions(roleId, selectedPermissions);
+        await rolesApi.syncPermissions(roleId, {
+          permissions: selectedPermissions,
+        });
       }
 
       navigate(routes.roles.show(roleId));

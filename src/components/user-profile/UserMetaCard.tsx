@@ -1,7 +1,7 @@
 import { ChangeEvent, useRef, useState } from 'react';
 
 import { useAuth } from '../../auth/useAuth';
-import { authService } from '../../auth/authService';
+import { profile } from '../../api/profile';
 import { userStatusColors, userStatusLabels } from '../../types/user';
 import Badge from '../ui/badge/Badge';
 
@@ -57,7 +57,7 @@ export default function UserMetaCard() {
     setIsUploading(true);
 
     try {
-      await authService.updateAvatar(file);
+      await profile.updateAvatar(file);
       await refreshUser();
     } catch (error: unknown) {
       const response = (
