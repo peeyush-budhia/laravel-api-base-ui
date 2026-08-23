@@ -1,3 +1,5 @@
+import type { ApiResponse } from '../api/types';
+
 export interface PaginationMeta {
   current_page: number;
   per_page: number;
@@ -14,8 +16,6 @@ export interface PaginationMeta {
   };
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  errors: unknown;
+export type PaginatedResponse<T> = ApiResponse<T[]> & {
   meta: PaginationMeta;
-}
+};

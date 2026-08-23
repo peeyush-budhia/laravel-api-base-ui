@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { AuthContext } from './context';
 import { authService } from './authService';
 import { tokenStorage } from './token';
+import { hasPermission } from './authorization';
 import type { AuthUser, LoginCredentials } from './types';
 import type { Permission } from './permissions';
 
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const currentUser = await authService.me();
+
       setUser(currentUser);
     } catch {
       tokenStorage.clear();
@@ -57,9 +59,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
     }
   }, []);
+
   const can = useCallback(
     (permission: Permission): boolean => {
-      return user?.permissions.includes(permission) ?? false;
+      return hasPermission(user, permission);
     },
     [user],
   );
@@ -72,7 +75,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (event.newValue === null) {
         setUser(null);
-
         return;
       }
 

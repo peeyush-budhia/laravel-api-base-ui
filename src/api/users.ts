@@ -1,5 +1,6 @@
 import { apiClient } from './client';
 import { endpoints } from './endpoints';
+import type { ApiResponse } from './types';
 import type {
   CreateUserPayload,
   UpdateUserPayload,
@@ -23,50 +24,49 @@ export const usersApi = {
         },
       },
     );
+
     return response.data;
   },
 
   async show(id: string): Promise<User> {
-    const response = await apiClient.get<{
-      data: User;
-      errors: unknown;
-    }>(`${endpoints.users.index}/${id}`);
+    const response = await apiClient.get<ApiResponse<User>>(
+      endpoints.users.show(id),
+    );
 
     return response.data.data;
   },
 
   async create(payload: CreateUserPayload): Promise<User> {
-    const response = await apiClient.post<{
-      data: User;
-      errors: unknown;
-    }>(endpoints.users.index, payload);
+    const response = await apiClient.post<ApiResponse<User>>(
+      endpoints.users.index,
+      payload,
+    );
 
     return response.data.data;
   },
 
   async update(id: string, payload: UpdateUserPayload): Promise<User> {
-    const response = await apiClient.patch<{
-      data: User;
-      errors: unknown;
-    }>(`${endpoints.users.index}/${id}`, payload);
+    const response = await apiClient.patch<ApiResponse<User>>(
+      endpoints.users.show(id),
+      payload,
+    );
 
     return response.data.data;
   },
 
   async delete(id: string): Promise<void> {
-    await apiClient.delete(`${endpoints.users.index}/${id}`);
+    await apiClient.delete(endpoints.users.show(id));
   },
 
   async restore(id: string): Promise<User> {
-    const response = await apiClient.patch<{
-      data: User;
-      errors: unknown;
-    }>(`${endpoints.users.index}/${id}/restore`);
+    const response = await apiClient.patch<ApiResponse<User>>(
+      endpoints.users.restore(id),
+    );
 
     return response.data.data;
   },
 
   async forceDelete(id: string): Promise<void> {
-    await apiClient.delete(`${endpoints.users.index}/${id}/force`);
+    await apiClient.delete(endpoints.users.forceDelete(id));
   },
 };
