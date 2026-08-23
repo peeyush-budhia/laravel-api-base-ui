@@ -1,4 +1,7 @@
 import type { Permission } from './permissions';
+
+export type AuthUserStatus = 'active' | 'inactive' | 'suspended';
+
 export interface AuthUser {
   id: string;
   first_name: string;
@@ -8,12 +11,12 @@ export interface AuthUser {
   avatar: string | null;
   role: string | null;
   permissions: string[];
-  status: string;
+  status: AuthUserStatus;
   must_change_password: boolean;
   email_verified_at: string | null;
   last_login_at: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   deleted_at: string | null;
 }
 
@@ -36,12 +39,6 @@ export interface AuthContextValue {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   can: (permission: Permission) => boolean;
-}
-
-export interface UpdateProfileData {
-  first_name: string;
-  last_name: string;
-  email: string;
 }
 
 export interface ResetPasswordData {

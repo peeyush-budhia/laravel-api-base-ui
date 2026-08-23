@@ -1,3 +1,4 @@
+import type { ApiResponse } from '../api/types';
 import type { PaginatedResponse } from './pagination';
 
 export interface Role {
@@ -27,17 +28,20 @@ export interface RoleListParams {
 
 export type RoleListResponse = PaginatedResponse<Role>;
 
-export interface RoleResponse {
-  data: Role;
-  errors: unknown;
+export type RoleResponse = ApiResponse<Role>;
+
+export type RolePermissionsResponse = ApiResponse<Permission[]>;
+
+export type PermissionListResponse = ApiResponse<Permission[]>;
+
+export interface CreateRoleData {
+  name: string;
 }
 
-export interface RolePermissionsResponse {
-  data: Permission[];
-  errors: unknown;
+export interface UpdateRoleData {
+  name: string;
 }
 
-export interface PermissionListResponse {
-  data: Permission[];
-  errors: unknown;
+export interface SyncRolePermissionsData {
+  permissions: string[];
 }

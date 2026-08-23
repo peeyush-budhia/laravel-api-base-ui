@@ -12,8 +12,9 @@ import Home from './pages/dashboard/Home';
 import GuestNotFound from './pages/others/GuestNotFound';
 import ProtectedNotFound from './pages/others/ProtectedNotFound';
 
+import UserProfile from './pages/profile/Profile';
+
 import Users from './pages/users/Users';
-import UserProfiles from './pages/UserProfiles';
 import UserCreate from './pages/users/UserCreate';
 import UserDetails from './pages/users/UserDetails';
 import UserEdit from './pages/users/UserEdit';
@@ -27,7 +28,9 @@ import Settings from './pages/settings/Settings';
 
 import GuestRoute from './routes/GuestRoute';
 import ProtectedRoute from './routes/ProtectedRoute';
+import PermissionRoute from './routes/PermissionRoute';
 
+import { permissions } from './auth/permissions';
 import { routes } from './routes/routes';
 
 export default function App() {
@@ -56,22 +59,64 @@ export default function App() {
           />
 
           <Route element={<AppLayout />}>
+            {/* Dashboard */}
             <Route path={routes.dashboard.home} element={<Home />} />
 
-            <Route path={routes.users.index} element={<Users />} />
-            <Route path={routes.users.showPattern} element={<UserDetails />} />
-            <Route path={routes.users.create} element={<UserCreate />} />
-            <Route path={routes.users.editPattern} element={<UserEdit />} />
+            {/* Profile */}
+            <Route path={routes.profile.index} element={<UserProfile />} />
 
-            <Route path={routes.roles.index} element={<Roles />} />
-            <Route path={routes.roles.showPattern} element={<RoleDetails />} />
-            <Route path={routes.roles.create} element={<RoleCreate />} />
-            <Route path={routes.roles.editPattern} element={<RoleEdit />} />
-
+            {/* Settings */}
             <Route path={routes.settings.index} element={<Settings />} />
 
-            <Route path={routes.profile.index} element={<UserProfiles />} />
+            {/* Users */}
+            <Route
+              element={<PermissionRoute permission={permissions.usersView} />}
+            >
+              <Route path={routes.users.index} element={<Users />} />
 
+              <Route
+                path={routes.users.showPattern}
+                element={<UserDetails />}
+              />
+            </Route>
+
+            <Route
+              element={<PermissionRoute permission={permissions.usersCreate} />}
+            >
+              <Route path={routes.users.create} element={<UserCreate />} />
+            </Route>
+
+            <Route
+              element={<PermissionRoute permission={permissions.usersUpdate} />}
+            >
+              <Route path={routes.users.editPattern} element={<UserEdit />} />
+            </Route>
+
+            {/* Roles */}
+            <Route
+              element={<PermissionRoute permission={permissions.rolesView} />}
+            >
+              <Route path={routes.roles.index} element={<Roles />} />
+
+              <Route
+                path={routes.roles.showPattern}
+                element={<RoleDetails />}
+              />
+            </Route>
+
+            <Route
+              element={<PermissionRoute permission={permissions.rolesCreate} />}
+            >
+              <Route path={routes.roles.create} element={<RoleCreate />} />
+            </Route>
+
+            <Route
+              element={<PermissionRoute permission={permissions.rolesUpdate} />}
+            >
+              <Route path={routes.roles.editPattern} element={<RoleEdit />} />
+            </Route>
+
+            {/* Protected 404 */}
             <Route path="*" element={<ProtectedNotFound />} />
           </Route>
         </Route>

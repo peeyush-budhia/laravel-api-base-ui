@@ -2,17 +2,16 @@ import { apiClient } from './client';
 import { endpoints } from './endpoints';
 
 import type {
+  CreateRoleData,
   Permission,
   Role,
   RoleListParams,
   RoleListResponse,
   RolePermissionsResponse,
   RoleResponse,
+  SyncRolePermissionsData,
+  UpdateRoleData,
 } from '../types/role';
-
-export interface UpdateRoleData {
-  name: string;
-}
 
 export const rolesApi = {
   async list(params: RoleListParams = {}): Promise<RoleListResponse> {
@@ -34,7 +33,7 @@ export const rolesApi = {
 
   async show(id: string): Promise<Role> {
     const response = await apiClient.get<RoleResponse>(
-      `${endpoints.roles.index}/${id}`,
+      endpoints.roles.show(id),
     );
 
     return response.data.data;
@@ -48,7 +47,7 @@ export const rolesApi = {
     return response.data.data;
   },
 
-  async create(data: { name: string }): Promise<Role> {
+  async create(data: CreateRoleData): Promise<Role> {
     const response = await apiClient.post<RoleResponse>(
       endpoints.roles.index,
       data,
@@ -65,7 +64,7 @@ export const rolesApi = {
    */
   async update(id: string, data: UpdateRoleData): Promise<Role> {
     const response = await apiClient.put<RoleResponse>(
-      `${endpoints.roles.index}/${id}`,
+      endpoints.roles.show(id),
       data,
     );
 
@@ -73,12 +72,12 @@ export const rolesApi = {
   },
 
   async remove(id: string): Promise<void> {
-    await apiClient.delete(`${endpoints.roles.index}/${id}`);
+    await apiClient.delete(endpoints.roles.show(id));
   },
 
   async permissions(id: string): Promise<Permission[]> {
     const response = await apiClient.get<RolePermissionsResponse>(
-      `${endpoints.roles.index}/${id}/permissions`,
+      endpoints.roles.rolePermissions(id),
     );
 
     return response.data.data;
@@ -89,12 +88,13 @@ export const rolesApi = {
    *
    * Requires roles.manage-permissions on the backend.
    */
-  async syncPermissions(id: string, permissions: string[]): Promise<Role> {
+  async syncPermissions(
+    id: string,
+    data: SyncRolePermissionsData,
+  ): Promise<Role> {
     const response = await apiClient.put<RoleResponse>(
-      `${endpoints.roles.index}/${id}/permissions`,
-      {
-        permissions,
-      },
+      endpoints.roles.rolePermissions(id),
+      data,
     );
 
     return response.data.data;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useAuth } from '../../auth/useAuth';
-import { authService } from '../../auth/authService';
+import { profile } from '../../api/profile';
 
 import { useModal } from '../../hooks/useModal';
 import { Modal } from '../ui/modal';
@@ -63,7 +63,7 @@ export default function UserInfoCard() {
     setGeneralError('');
 
     try {
-      await authService.updateProfile({
+      await profile.updateProfile({
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         email: email.trim(),
@@ -243,23 +243,6 @@ export default function UserInfoCard() {
           </div>
 
           <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              size="sm"
-              onClick={() => void handleSave()}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </Button>
-
             <Button
               size="sm"
               onClick={() => void handleSave()}

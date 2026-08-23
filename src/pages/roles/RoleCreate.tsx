@@ -124,7 +124,9 @@ export default function RoleCreate() {
        * current user has permission to do so.
        */
       if (canManageRolePermissions) {
-        await rolesApi.syncPermissions(role.id, selectedPermissions);
+        await rolesApi.syncPermissions(role.id, {
+          permissions: selectedPermissions,
+        });
       }
 
       navigate(routes.roles.show(role.id), {
