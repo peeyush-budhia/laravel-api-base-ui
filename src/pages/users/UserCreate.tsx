@@ -11,6 +11,10 @@ import PageMeta from '../../components/common/PageMeta';
 import UserForm from '../../components/users/UserForm';
 
 import { routes } from '../../routes/routes';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
 interface FieldErrors {
   first_name?: string[];
@@ -93,19 +97,10 @@ export default function UserCreate() {
 
       navigate(routes.users.index);
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: FieldErrors;
-            };
-          };
-        }
-      ).response;
-
-      setFieldErrors(response?.data?.errors ?? {});
-      setGeneralError(response?.data?.message ?? 'Unable to create user.');
+      setFieldErrors(getApiFieldErrors(error) as FieldErrors);
+      setGeneralError(
+        getApiErrorMessage(error, 'Unable to create user. Please try again.'),
+      );
     } finally {
       setIsSubmitting(false);
     }

@@ -14,7 +14,7 @@ export default function FilterBar({
   return (
     <form
       onSubmit={onSubmit}
-      className={`flex flex-col gap-3 sm:flex-row ${className}`.trim()}
+      className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`.trim()}
     >
       {children}
     </form>

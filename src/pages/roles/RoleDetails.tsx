@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { Link, useParams } from 'react-router';
 
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import PermissionGroups from '../../components/permissions/PermissionGroups';
 import Badge from '../../components/ui/badge/Badge';
+
+import LoadingState from '../../components/common/LoadingState';
+import ErrorState from '../../components/common/ErrorState';
+import { getApiErrorMessage } from '../../utils/apiErrorUtils';
 
 import { rolesApi } from '../../api/roles';
 
@@ -13,17 +18,17 @@ import type { Permission, Role } from '../../types/role';
 import { routes } from '../../routes/routes';
 import { SUPER_ADMIN_ROLE } from '../../constants/roles';
 
-import { useAuth } from '../../auth/useAuth';
 import { permissions as authPermissions } from '../../auth/permissions';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
+import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function RoleDetails() {
   const { id } = useParams<{ id: string }>();
 
-  const { can } = useAuth();
+  const { can } = useAuthorization();
 
-  const canViewRoles = can(authPermissions.rolesView);
+  const canViewRoles = can(authPermissions.roles.view);
 
   const [role, setRole] = useState<Role | null>(null);
   const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
@@ -31,50 +36,7 @@ export default function RoleDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!canViewRoles || !id) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const fetchRole = async () => {
-      try {
-        const [roleData, permissionsData] = await Promise.all([
-          rolesApi.show(id),
-          rolesApi.permissions(id),
-        ]);
-
-        if (cancelled) {
-          return;
-        }
-
-        setRole(roleData);
-        setRolePermissions(permissionsData);
-        setError('');
-      } catch {
-        if (cancelled) {
-          return;
-        }
-
-        setRole(null);
-        setRolePermissions([]);
-        setError('Unable to load role. Please try again.');
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    void fetchRole();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [canViewRoles, id]);
-
-  function handleRetry() {
+  const loadRole = useCallback(async () => {
     if (!id) {
       return;
     }
@@ -82,20 +44,38 @@ export default function RoleDetails() {
     setIsLoading(true);
     setError('');
 
-    void Promise.all([rolesApi.show(id), rolesApi.permissions(id)])
-      .then(([roleData, permissionsData]) => {
-        setRole(roleData);
-        setRolePermissions(permissionsData);
-      })
-      .catch(() => {
-        setRole(null);
-        setRolePermissions([]);
-        setError('Unable to load role. Please try again.');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
+    try {
+      const [roleData, permissionsData] = await Promise.all([
+        rolesApi.show(id),
+        rolesApi.permissions(id),
+      ]);
+      setRole(roleData);
+      setRolePermissions(permissionsData);
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(
+          error,
+          'Unable to load role details. Please try again.',
+        ),
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void loadRole();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [id, loadRole]);
 
   if (!canViewRoles) {
     return (
@@ -137,42 +117,11 @@ export default function RoleDetails() {
         </div>
 
         {/* Loading */}
-        {isLoading && (
-          <>
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-              <div className="space-y-4">
-                <div className="h-6 w-48 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                <div className="h-4 w-72 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                <div className="h-4 w-56 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-              <div className="h-6 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-
-              <div className="mt-6 space-y-4">
-                <div className="h-32 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
-                <div className="h-32 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
-              </div>
-            </div>
-          </>
-        )}
+        {isLoading && <LoadingState message="Loading role..." />}
 
         {/* Error */}
         {!isLoading && error && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-            <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-              {error}
-            </div>
-
-            <button
-              type="button"
-              onClick={handleRetry}
-              className="mt-3 text-sm font-medium text-brand-500 hover:text-brand-600"
-            >
-              Try again
-            </button>
-          </div>
+          <ErrorState message={error} onRetry={() => void loadRole()} />
         )}
 
         {/* Role */}

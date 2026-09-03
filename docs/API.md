@@ -46,6 +46,12 @@ Current endpoint map:
 /auth/forgot-password
 /auth/reset-password
 /auth/change-password
+/auth/password-policy
+
+/dashboard
+
+/audit-logs
+/audit-logs/{id}
 
 /profile
 /profile/avatar
@@ -77,6 +83,28 @@ Operations:
 - Forgot password
 - Reset password
 - Change password
+- Get password policy
+
+### Dashboard
+
+```text
+src/api/dashboard.ts
+```
+
+Operations:
+
+- Get dashboard data
+
+### Audit Logs
+
+```text
+src/api/auditLogs.ts
+```
+
+Operations:
+
+- List audit logs
+- Show audit log
 
 ### Profile
 
@@ -186,6 +214,10 @@ src/auth/authorization.ts
 The frontend currently uses permissions including:
 
 ```text
+dashboard.view
+
+audit-logs.view
+
 roles.view
 roles.create
 roles.update

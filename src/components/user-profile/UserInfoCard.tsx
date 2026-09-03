@@ -2,6 +2,10 @@ import { useState } from 'react';
 
 import { useAuth } from '../../auth/useAuth';
 import { profile } from '../../api/profile';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
 import { useModal } from '../../hooks/useModal';
 import { Modal } from '../ui/modal';
@@ -73,21 +77,9 @@ export default function UserInfoCard() {
 
       closeModal();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: FieldErrors;
-            };
-          };
-        }
-      ).response;
-
-      setFieldErrors(response?.data?.errors ?? {});
-
+      setFieldErrors(getApiFieldErrors(error) as FieldErrors);
       setGeneralError(
-        response?.data?.message ?? 'Unable to update your profile.',
+        getApiErrorMessage(error, 'Unable to update your profile.'),
       );
     } finally {
       setIsSubmitting(false);

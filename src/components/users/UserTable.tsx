@@ -10,6 +10,8 @@ import {
 
 import Badge from '../ui/badge/Badge';
 
+import { LoadingRows, SortableHeader } from '../common/Table';
+
 import {
   userStatusColors,
   userStatusLabels,
@@ -22,6 +24,7 @@ import UserAvatar from './UserAvatar';
 import UserActions from './UserActions';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
+
 interface UserTableProps {
   users: User[];
   isLoading: boolean;
@@ -40,57 +43,6 @@ interface UserTableProps {
   onDelete: (user: User) => void;
   onRestore: (user: User) => void;
   onForceDelete: (user: User) => void;
-}
-
-function LoadingRows() {
-  return (
-    <>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <TableRow key={`loading-row-${rowIndex}`}>
-          {Array.from({ length: 6 }).map((__, cellIndex) => (
-            <TableCell key={`loading-cell-${cellIndex}`} className="px-5 py-4">
-              <div className="h-5 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-            </TableCell>
-          ))}
-        </TableRow>
-      ))}
-    </>
-  );
-}
-
-interface SortableHeaderProps {
-  field: string;
-  label: string;
-  sort: string;
-  direction: 'asc' | 'desc';
-  onSort: (field: string) => void;
-  className?: string;
-}
-
-function SortableHeader({
-  field,
-  label,
-  sort,
-  direction,
-  onSort,
-  className = '',
-}: SortableHeaderProps) {
-  return (
-    <TableCell
-      isHeader
-      className={`px-5 py-4 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400 ${className}`.trim()}
-    >
-      <button
-        type="button"
-        onClick={() => onSort(field)}
-        className="inline-flex items-center gap-1"
-      >
-        {label}
-
-        {sort === field && <span>{direction === 'asc' ? '↑' : '↓'}</span>}
-      </button>
-    </TableCell>
-  );
 }
 
 export default function UserTable({
@@ -159,7 +111,7 @@ export default function UserTable({
         </TableHeader>
 
         <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {isLoading && <LoadingRows />}
+          {isLoading && <LoadingRows columns={6} />}
 
           {!isLoading &&
             users.map((user) => (
@@ -228,14 +180,6 @@ export default function UserTable({
                 </TableCell>
               </TableRow>
             ))}
-
-          {!isLoading && users.length === 0 && (
-            <TableRow>
-              <TableCell className="px-5 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                No users found.
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
     </div>

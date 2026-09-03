@@ -58,7 +58,7 @@ export default function ActionsDropdown({
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="dropdown-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover hover dark dark:hover/5 dark:hover"
+        className="dropdown-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="menu"

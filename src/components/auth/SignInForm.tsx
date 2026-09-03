@@ -1,12 +1,14 @@
 import type React from 'react';
 import { useState } from 'react';
-import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { EyeCloseIcon, EyeIcon } from '../../icons';
 import { useAuth } from '../../auth/useAuth';
-import type { ApiErrorResponse } from '../../api/types';
 import { routes } from '../../routes/routes';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
@@ -65,49 +67,41 @@ export default function SignInForm() {
       navigate(destination, {
         replace: true,
       });
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        const response = error.response;
+    } catch (error: unknown) {
+      /*
+       * apiClient normalizes Axios errors into ApiError.
+       * Keep the form independent of Axios internals.
+       */
+      const apiErrors = getApiFieldErrors(error);
+      if (Object.keys(apiErrors).length > 0) {
+        setFieldErrors({
+          login: apiErrors.login,
+          password: apiErrors.password,
+        });
 
-        if (response?.status === 422) {
-          const apiError = response.data;
-
-          setFieldErrors({
-            login: apiError.errors?.login,
-            password: apiError.errors?.password,
-          });
-
-          if (
-            !apiError.errors?.login &&
-            !apiError.errors?.password &&
-            apiError.message
-          ) {
-            setGeneralError(apiError.message);
-          }
-
-          return;
+        if (!apiErrors.login && !apiErrors.password) {
+          setGeneralError(getApiErrorMessage(error));
         }
 
-        if (response?.data?.message) {
-          setGeneralError(response.data.message);
-          return;
-        }
+        return;
       }
 
-      setGeneralError('Unable to sign in. Please try again.');
+      setGeneralError(
+        getApiErrorMessage(error, 'Unable to sign in. Please try again.'),
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="w-full max-w-md pt-10 mx-auto"></div>
+    <div className="flex flex-1 flex-col">
+      <div className="mx-auto w-full max-w-md pt-10" />
 
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
         <div>
           <div className="mb-5 sm:mb-8">
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+            <h1 className="mb-2 text-title-sm font-semibold text-gray-800 dark:text-white/90 sm:text-title-md">
               Sign In
             </h1>
 
@@ -118,15 +112,19 @@ export default function SignInForm() {
 
           <div>
             {generalError && (
-              <div className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
+              <div
+                role="alert"
+                className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400"
+              >
                 {generalError}
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
+                {/* Login */}
                 <div>
-                  <Label>
+                  <Label htmlFor="login">
                     Email <span className="text-error-500">*</span>
                   </Label>
 
@@ -136,18 +134,40 @@ export default function SignInForm() {
                     type="email"
                     placeholder="info@gmail.com"
                     value={loginValue}
-                    onChange={(event) => setLoginValue(event.target.value)}
+                    onChange={(event) => {
+                      setLoginValue(event.target.value);
+
+                      if (fieldErrors.login) {
+                        setFieldErrors((current) => ({
+                          ...current,
+                          login: undefined,
+                        }));
+                      }
+                    }}
                     disabled={isSubmitting}
                     error={Boolean(fieldErrors.login)}
                     hint={fieldErrors.login?.[0]}
+                    aria-invalid={Boolean(fieldErrors.login)}
+                    aria-describedby={
+                      fieldErrors.login ? 'login-hint' : undefined
+                    }
                   />
                 </div>
 
+                {/* Password */}
                 <div>
-                  <Label>
+                  <Label htmlFor="password">
                     Password <span className="text-error-500">*</span>
                   </Label>
 
+                  {/*
+                   * IMPORTANT:
+                   * The eye button is positioned relative to the input's
+                   * 44px field area, not the complete Input component.
+                   *
+                   * This keeps the icon vertically centered even when
+                   * validation text appears underneath.
+                   */}
                   <div className="relative">
                     <Input
                       id="password"
@@ -155,10 +175,24 @@ export default function SignInForm() {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       value={password}
-                      onChange={(event) => setPassword(event.target.value)}
+                      onChange={(event) => {
+                        setPassword(event.target.value);
+
+                        if (fieldErrors.password) {
+                          setFieldErrors((current) => ({
+                            ...current,
+                            password: undefined,
+                          }));
+                        }
+                      }}
                       disabled={isSubmitting}
                       error={Boolean(fieldErrors.password)}
                       hint={fieldErrors.password?.[0]}
+                      className="pr-12"
+                      aria-invalid={Boolean(fieldErrors.password)}
+                      aria-describedby={
+                        fieldErrors.password ? 'password-hint' : undefined
+                      }
                     />
 
                     <button
@@ -168,22 +202,33 @@ export default function SignInForm() {
                       aria-label={
                         showPassword ? 'Hide password' : 'Show password'
                       }
-                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2 disabled:cursor-not-allowed"
+                      className="absolute right-4 top-[22px] z-30 flex h-5 w-5 -translate-y-1/2 items-center justify-center disabled:cursor-not-allowed"
                     >
                       {showPassword ? (
-                        <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                        <EyeIcon
+                          className="size-5 fill-gray-500 dark:fill-gray-400"
+                          aria-hidden="true"
+                        />
                       ) : (
-                        <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                        <EyeCloseIcon
+                          className="size-5 fill-gray-500 dark:fill-gray-400"
+                          aria-hidden="true"
+                        />
                       )}
                     </button>
                   </div>
                 </div>
 
+                {/* Remember / Forgot password */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Checkbox checked={isChecked} onChange={setIsChecked} />
+                    <Checkbox
+                      checked={isChecked}
+                      onChange={setIsChecked}
+                      disabled={isSubmitting}
+                    />
 
-                    <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
+                    <span className="block text-theme-sm font-normal text-gray-700 dark:text-gray-400">
                       Keep me logged in
                     </span>
                   </div>
@@ -196,6 +241,7 @@ export default function SignInForm() {
                   </Link>
                 </div>
 
+                {/* Submit */}
                 <div>
                   <Button
                     type="submit"

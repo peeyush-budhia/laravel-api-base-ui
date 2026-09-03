@@ -16,7 +16,7 @@ export function hasAnyPermission(
   user: AuthUser | null,
   requiredPermissions: Permission[],
 ): boolean {
-  if (!user) {
+  if (!user || requiredPermissions.length === 0) {
     return false;
   }
 
@@ -29,7 +29,7 @@ export function hasAllPermissions(
   user: AuthUser | null,
   requiredPermissions: Permission[],
 ): boolean {
-  if (!user) {
+  if (!user || requiredPermissions.length === 0) {
     return false;
   }
 

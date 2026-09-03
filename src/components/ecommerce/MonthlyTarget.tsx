@@ -1,11 +1,13 @@
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { useState } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { MoreDotIcon } from '../../icons';
 
 export default function MonthlyTarget() {
+  const { theme } = useTheme();
   const series = [75.55];
   const options: ApexOptions = {
     colors: ['#465FFF'],
@@ -37,7 +39,7 @@ export default function MonthlyTarget() {
             fontSize: '36px',
             fontWeight: '600',
             offsetY: -40,
-            color: '#1D2939',
+            color: theme === 'dark' ? '#F9FAFB' : '#1D2939',
             formatter: function (val) {
               return val + '%';
             },
@@ -113,7 +115,7 @@ export default function MonthlyTarget() {
             +10%
           </span>
         </div>
-        <p className="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
+        <p className="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 dark:text-gray-400 sm:text-base">
           You earn $3287 today, it's higher than last month. Keep up your good
           work!
         </p>
