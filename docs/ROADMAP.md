@@ -2,6 +2,22 @@
 
 ## Current
 
+### v0.8.0 — Frontend Quality & UX
+
+- [x] Add a frontend automated test setup
+- [x] Add API service tests
+- [x] Add authentication flow tests
+- [x] Add permission/authorization tests
+- [x] Add user management tests
+- [x] Add role and permission management tests
+- [x] Improve loading and error states
+- [x] Improve empty states
+- [x] Improve form validation feedback
+- [x] Review accessibility across major screens
+- [x] Remove unused settings and signup screens
+
+## Recently Released
+
 ### v0.7.x — API Documentation & Integration
 
 - [x] Centralized API endpoint definitions
@@ -16,19 +32,6 @@
 - [x] Link frontend project to backend repository
 
 ## Next
-
-### v0.8.x — Frontend Quality & UX
-
-- [x] Add a frontend automated test setup
-- [x] Add API service tests
-- [x] Add authentication flow tests
-- [x] Add permission/authorization tests
-- [x] Add user management tests
-- [x] Add role and permission management tests
-- [x] Improve loading and error states
-- [x] Improve empty states
-- [x] Improve form validation feedback
-- [ ] Review accessibility across major screens
 
 ### v0.9.x — Frontend Feature Completeness
 
