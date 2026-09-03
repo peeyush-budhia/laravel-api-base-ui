@@ -7,7 +7,13 @@ export const routes = {
   },
 
   dashboard: {
-    home: '/',
+    home: '/dashboard',
+  },
+
+  auditLogs: {
+    index: '/audit-logs',
+    show: (id: string) => `/audit-logs/${id}`,
+    showPattern: '/audit-logs/:id',
   },
 
   profile: {
@@ -34,7 +40,7 @@ export const routes = {
     permissionsPattern: '/roles/:id/permissions',
   },
 
-  settings: {
-    index: '/settings',
+  error: {
+    unauthorized: '/unauthorized',
   },
 } as const;

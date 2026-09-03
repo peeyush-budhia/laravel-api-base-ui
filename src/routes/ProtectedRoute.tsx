@@ -24,10 +24,11 @@ export default function ProtectedRoute() {
   }
 
   /*
-   * Users with a temporary/generated password must change it
-   * before accessing the rest of the application.
+   * Users who are required to change their password must not be
+   * allowed to access the normal application until the password
+   * has been changed.
    *
-   * Allow the change-password route itself to prevent a redirect loop.
+   * The change-password route itself must remain accessible.
    */
   if (
     user.must_change_password &&

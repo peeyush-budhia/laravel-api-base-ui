@@ -222,11 +222,10 @@ export default function UserForm({
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button
           type="button"
+          size="sm"
+          variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
-          className={`inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03] ${
-            isSubmitting ? 'pointer-events-none opacity-50' : ''
-          }`}
         >
           Cancel
         </Button>

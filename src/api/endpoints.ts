@@ -8,6 +8,16 @@ export const endpoints = {
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
     changePassword: '/auth/change-password',
+    passwordPolicy: '/auth/password-policy',
+  },
+
+  dashboard: {
+    index: '/dashboard',
+  },
+
+  auditLogs: {
+    index: '/audit-logs',
+    show: (id: string) => `/audit-logs/${id}`,
   },
 
   profile: {

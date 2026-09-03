@@ -1,15 +1,35 @@
 export const permissions = {
-  rolesView: 'roles.view',
-  rolesCreate: 'roles.create',
-  rolesUpdate: 'roles.update',
-  rolesDelete: 'roles.delete',
-  rolesManagePermissions: 'roles.manage-permissions',
+  dashboard: {
+    view: 'dashboard.view',
+  },
 
-  usersView: 'users.view',
-  usersCreate: 'users.create',
-  usersUpdate: 'users.update',
-  usersDelete: 'users.delete',
-  usersRestore: 'users.restore',
+  auditLogs: {
+    view: 'audit-logs.view',
+  },
+
+  users: {
+    view: 'users.view',
+    create: 'users.create',
+    update: 'users.update',
+    delete: 'users.delete',
+    restore: 'users.restore',
+  },
+
+  roles: {
+    view: 'roles.view',
+    create: 'roles.create',
+    update: 'roles.update',
+    delete: 'roles.delete',
+    managePermissions: 'roles.manage-permissions',
+  },
 } as const;
 
-export type Permission = (typeof permissions)[keyof typeof permissions];
+type PermissionValues<T> = T extends string
+  ? T
+  : T extends Record<string, infer V>
+    ? V extends string
+      ? V
+      : PermissionValues<V>
+    : never;
+
+export type Permission = PermissionValues<typeof permissions>;

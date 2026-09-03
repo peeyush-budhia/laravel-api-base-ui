@@ -9,6 +9,7 @@ import {
   HorizontaLDots,
   BoxCubeIcon,
   UserCircleIcon,
+  ListIcon,
 } from '../icons';
 import { useSidebar } from '../context/SidebarContext';
 
@@ -32,12 +33,17 @@ const administrationItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: 'Users',
-    path: '/users',
+    path: routes.users.index,
   },
   {
     icon: <BoxCubeIcon />,
     name: 'Roles & Permissions',
-    path: '/roles',
+    path: routes.roles.index,
+  },
+  {
+    icon: <ListIcon />,
+    name: 'Audit Logs',
+    path: routes.auditLogs.index,
   },
 ];
 
@@ -46,11 +52,6 @@ const othersItems: NavItem[] = [
   //   icon: <UserCircleIcon />,
   //   name: 'My Profile',
   //   path: '/profile',
-  // },
-  // {
-  //   icon: <PlugInIcon />,
-  //   name: 'Settings',
-  //   path: '/settings',
   // },
 ];
 
@@ -69,7 +70,8 @@ const AppSidebar: React.FC = () => {
 
   // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback(
-    (path: string) => location.pathname === path,
+    (path: string) =>
+      location.pathname === path || location.pathname.startsWith(`${path}/`),
     [location.pathname],
   );
 
@@ -271,7 +273,7 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
         }`}
       >
-        <Link to="/">
+        <Link to={routes.dashboard.home}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img

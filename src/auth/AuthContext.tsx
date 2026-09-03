@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+
 import { AuthContext } from './context';
 import { authService } from './authService';
 import { tokenStorage } from './token';
-import { hasPermission } from './authorization';
+
 import type { AuthUser, LoginCredentials } from './types';
-import type { Permission } from './permissions';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     const data = await authService.login(credentials);
 
-    tokenStorage.set(data.token);
+    tokenStorage.set(data.token, credentials.rememberMe);
     setUser(data.user);
   }, []);
 
@@ -60,16 +60,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const can = useCallback(
-    (permission: Permission): boolean => {
-      return hasPermission(user, permission);
-    },
-    [user],
-  );
-
   useEffect(() => {
     function handleStorage(event: StorageEvent) {
-      if (event.key !== 'access_token') {
+      if (
+        event.key !== 'access_token' ||
+        (event.storageArea !== localStorage &&
+          event.storageArea !== sessionStorage)
+      ) {
         return;
       }
 
@@ -97,7 +94,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         login,
         logout,
         refreshUser,
-        can,
       }}
     >
       {children}

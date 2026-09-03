@@ -1,19 +1,20 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { usersApi } from '../../api/users';
+import { permissions } from '../../auth/permissions';
+import { useAuthorization } from '../../auth/useAuthorization';
 import { rolesApi } from '../../api/roles';
-
+import { usersApi } from '../../api/users';
 import type { Role } from '../../types/role';
 import type { UpdateUserPayload, User, UserStatus } from '../../types/user';
+import { routes } from '../../routes/routes';
+import { getApiErrorMessage } from '../../utils/apiErrorUtils';
+import { getApiFieldErrors } from '../../utils/apiErrorUtils';
 
-import { useAuth } from '../../auth/useAuth';
-import { permissions } from '../../auth/permissions';
-
+import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
 import UserForm from '../../components/users/UserForm';
-
-import { routes } from '../../routes/routes';
 
 interface FieldErrors {
   first_name?: string[];
@@ -27,9 +28,9 @@ export default function UserEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { can } = useAuth();
+  const { can } = useAuthorization();
 
-  const canUpdateUsers = can(permissions.usersUpdate);
+  const canUpdateUsers = can(permissions.users.update);
 
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -37,6 +38,9 @@ export default function UserEdit() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [userLoadError, setUserLoadError] = useState('');
+  const [rolesLoadError, setRolesLoadError] = useState('');
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -48,13 +52,16 @@ export default function UserEdit() {
   const [generalError, setGeneralError] = useState('');
 
   useEffect(() => {
-    if (!id) {
+    if (!id || !canUpdateUsers) {
       return;
     }
 
     let cancelled = false;
 
     const loadUser = async () => {
+      setIsLoading(true);
+      setUserLoadError('');
+
       try {
         const response = await usersApi.show(id);
 
@@ -68,11 +75,16 @@ export default function UserEdit() {
         setEmail(response.email);
         setRole(response.role ?? '');
         setStatus(response.status);
-      } catch {
-        if (!cancelled) {
-          setUser(null);
-          setGeneralError('Unable to load user. Please try again.');
+      } catch (error: unknown) {
+        if (cancelled) {
+          return;
         }
+
+        setUser(null);
+
+        setUserLoadError(
+          getApiErrorMessage(error, 'Unable to load user. Please try again.'),
+        );
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -80,26 +92,41 @@ export default function UserEdit() {
       }
     };
 
-    void loadUser();
+    const timer = window.setTimeout(() => {
+      void loadUser();
+    }, 0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [id]);
+  }, [id, canUpdateUsers]);
 
   useEffect(() => {
+    if (!canUpdateUsers) {
+      return;
+    }
+
     let cancelled = false;
 
     const loadRoles = async () => {
+      setIsLoadingRoles(true);
+      setRolesLoadError('');
+
       try {
         const response = await rolesApi.list();
 
         if (!cancelled) {
           setRoles(response.data);
         }
-      } catch {
+      } catch (error: unknown) {
         if (!cancelled) {
-          setGeneralError('Unable to load roles. Please try again.');
+          setRolesLoadError(
+            getApiErrorMessage(
+              error,
+              'Unable to load roles. Please try again.',
+            ),
+          );
         }
       } finally {
         if (!cancelled) {
@@ -108,12 +135,15 @@ export default function UserEdit() {
       }
     };
 
-    void loadRoles();
+    const timer = window.setTimeout(() => {
+      void loadRoles();
+    }, 0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, []);
+  }, [canUpdateUsers]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -139,19 +169,10 @@ export default function UserEdit() {
 
       navigate(routes.users.show(id));
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: FieldErrors;
-            };
-          };
-        }
-      ).response;
-
-      setFieldErrors(response?.data?.errors ?? {});
-      setGeneralError(response?.data?.message ?? 'Unable to update user.');
+      setFieldErrors(getApiFieldErrors(error) as FieldErrors);
+      setGeneralError(
+        getApiErrorMessage(error, 'Unable to update user. Please try again.'),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -187,18 +208,23 @@ export default function UserEdit() {
       <>
         <PageMeta title="Edit User" description="Edit application user" />
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <div className="h-7 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+        <LoadingState message="Loading user..." />
+      </>
+    );
+  }
 
-          <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-11 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
-              />
-            ))}
-          </div>
-        </div>
+  if (userLoadError) {
+    return (
+      <>
+        <PageMeta title="Edit User" description="Edit application user" />
+
+        <ErrorState
+          title="Unable to load user"
+          message={userLoadError}
+          onRetry={() => {
+            window.location.reload();
+          }}
+        />
       </>
     );
   }
@@ -214,7 +240,7 @@ export default function UserEdit() {
           </h1>
 
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {generalError || 'The requested user could not be found.'}
+            The requested user could not be found.
           </p>
 
           <Link
@@ -254,6 +280,16 @@ export default function UserEdit() {
             ← Back to User
           </Link>
         </div>
+
+        {rolesLoadError && (
+          <ErrorState
+            title="Unable to load roles"
+            message={rolesLoadError}
+            onRetry={() => {
+              window.location.reload();
+            }}
+          />
+        )}
 
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
           <UserForm

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
+import LoadingState from '../../components/common/LoadingState';
+
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import RoleForm from '../../components/roles/RoleForm';
@@ -10,20 +12,24 @@ import { rolesApi } from '../../api/roles';
 import type { Permission } from '../../types/role';
 
 import { routes } from '../../routes/routes';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 import { SUPER_ADMIN_ROLE } from '../../constants/roles';
 
-import { useAuth } from '../../auth/useAuth';
 import { permissions as authPermissions } from '../../auth/permissions';
+import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function RoleEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { can } = useAuth();
+  const { can } = useAuthorization();
 
-  const canUpdateRoles = can(authPermissions.rolesUpdate);
+  const canUpdateRoles = can(authPermissions.roles.update);
 
-  const canManageRolePermissions = can(authPermissions.rolesManagePermissions);
+  const canManageRolePermissions = can(authPermissions.roles.managePermissions);
 
   const canEditRole = canUpdateRoles || canManageRolePermissions;
 
@@ -142,6 +148,7 @@ export default function RoleEdit() {
   const roleId = id;
 
   if (isLoading) {
+    <LoadingState message="Loading role..." />;
     return (
       <>
         <PageMeta title="Edit Role" description="Edit role and permissions" />
@@ -260,27 +267,17 @@ export default function RoleEdit() {
 
       navigate(routes.roles.show(roleId));
     } catch (requestError: unknown) {
-      const response = requestError as {
-        response?: {
-          data?: {
-            errors?: {
-              name?: string[];
-              permissions?: string[];
-            };
-            message?: string;
-          };
-        };
-      };
-
-      const validationError = response.response?.data?.errors?.name?.[0];
+      const validationError = getApiFieldErrors(requestError).name?.[0];
 
       setNameError(validationError ?? '');
 
       setError(
         validationError
           ? ''
-          : (response.response?.data?.message ??
-              'Unable to update role. Please try again.'),
+          : getApiErrorMessage(
+              requestError,
+              'Unable to update role. Please try again.',
+            ),
       );
     } finally {
       setIsSubmitting(false);

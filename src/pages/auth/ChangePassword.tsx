@@ -1,10 +1,19 @@
-import { useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { authService } from '../../auth/authService';
 import { useAuth } from '../../auth/useAuth';
+import { usePasswordPolicy } from '../../hooks/usePasswordPolicy';
 import { routes } from '../../routes/routes';
+import { validatePassword } from '../../utils/passwordValidationUtils';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
+import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
@@ -20,6 +29,13 @@ export default function ChangePassword() {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
 
+  const {
+    policy,
+    isLoading: isPolicyLoading,
+    error: policyError,
+    reload: reloadPasswordPolicy,
+  } = usePasswordPolicy();
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -27,6 +43,60 @@ export default function ChangePassword() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const passwordValidation = useMemo(() => {
+    if (!policy) {
+      return null;
+    }
+
+    return validatePassword(password, policy);
+  }, [password, policy]);
+
+  function validate(): FieldErrors {
+    const errors: FieldErrors = {};
+
+    if (!currentPassword.trim()) {
+      errors.current_password = ['Current password is required.'];
+    }
+
+    if (!password.trim()) {
+      errors.password = ['New password is required.'];
+    } else if (policy && passwordValidation && !passwordValidation.valid) {
+      const messages: string[] = [];
+
+      if (!passwordValidation.minLength) {
+        messages.push(
+          `Password must be at least ${policy.min_length} characters.`,
+        );
+      }
+
+      if (policy.require_mixed_case && !passwordValidation.mixedCase) {
+        messages.push(
+          'Password must contain at least one uppercase and one lowercase letter.',
+        );
+      }
+
+      if (policy.require_numbers && !passwordValidation.numbers) {
+        messages.push('Password must contain at least one number.');
+      }
+
+      if (policy.require_symbols && !passwordValidation.symbols) {
+        messages.push('Password must contain at least one symbol.');
+      }
+
+      if (messages.length > 0) {
+        errors.password = messages;
+      }
+    }
+
+    if (!passwordConfirmation.trim()) {
+      errors.password_confirmation = ['Please confirm your new password.'];
+    } else if (password !== passwordConfirmation) {
+      errors.password_confirmation = ['Passwords do not match.'];
+    }
+
+    return errors;
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,6 +107,13 @@ export default function ChangePassword() {
 
     setFieldErrors({});
     setGeneralError('');
+
+    const validationErrors = validate();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -53,24 +130,25 @@ export default function ChangePassword() {
 
       navigate(routes.dashboard.home, { replace: true });
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: FieldErrors;
-            };
-          };
-        }
-      ).response;
-
-      setFieldErrors(response?.data?.errors ?? {});
-
+      const apiErrors = getApiFieldErrors(error);
+      setFieldErrors(apiErrors as FieldErrors);
       setGeneralError(
-        response?.data?.message ?? 'Unable to change your password.',
+        Object.keys(apiErrors).length === 0
+          ? getApiErrorMessage(error, 'Unable to change your password.')
+          : '',
       );
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  function clearPasswordErrors() {
+    if (fieldErrors.password || fieldErrors.password_confirmation) {
+      setFieldErrors((errors) => ({
+        ...errors,
+        password: undefined,
+        password_confirmation: undefined,
+      }));
     }
   }
 
@@ -101,12 +179,86 @@ export default function ChangePassword() {
             </div>
 
             {generalError && (
-              <div className="mb-5 rounded-lg border border-error-500/20 bg-error-500/5 px-4 py-3 text-sm text-error-500">
+              <div
+                role="alert"
+                className="mb-5 rounded-lg border border-error-500/20 bg-error-500/5 px-4 py-3 text-sm text-error-500"
+              >
                 {generalError}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="mb-5">
+              {isPolicyLoading ? (
+                <LoadingState message="Loading password requirements..." />
+              ) : policyError ? (
+                <ErrorState
+                  message={policyError}
+                  onRetry={() => {
+                    void reloadPasswordPolicy();
+                  }}
+                />
+              ) : policy ? (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/30">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Password requirements
+                  </p>
+
+                  <ul className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                    <li
+                      className={
+                        passwordValidation?.minLength
+                          ? 'text-success-500'
+                          : undefined
+                      }
+                    >
+                      {passwordValidation?.minLength ? '✓' : '•'} At least{' '}
+                      {policy.min_length} characters
+                    </li>
+
+                    {policy.require_mixed_case && (
+                      <li
+                        className={
+                          passwordValidation?.mixedCase
+                            ? 'text-success-500'
+                            : undefined
+                        }
+                      >
+                        {passwordValidation?.mixedCase ? '✓' : '•'} One
+                        uppercase and one lowercase letter
+                      </li>
+                    )}
+
+                    {policy.require_numbers && (
+                      <li
+                        className={
+                          passwordValidation?.numbers
+                            ? 'text-success-500'
+                            : undefined
+                        }
+                      >
+                        {passwordValidation?.numbers ? '✓' : '•'} At least one
+                        number
+                      </li>
+                    )}
+
+                    {policy.require_symbols && (
+                      <li
+                        className={
+                          passwordValidation?.symbols
+                            ? 'text-success-500'
+                            : undefined
+                        }
+                      >
+                        {passwordValidation?.symbols ? '✓' : '•'} At least one
+                        symbol
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               <div>
                 <Label htmlFor="current_password">
                   Current Password <span className="text-error-500">*</span>
@@ -118,10 +270,25 @@ export default function ChangePassword() {
                   type="password"
                   placeholder="Enter your current password"
                   value={currentPassword}
-                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  onChange={(event) => {
+                    setCurrentPassword(event.target.value);
+
+                    if (fieldErrors.current_password) {
+                      setFieldErrors((errors) => ({
+                        ...errors,
+                        current_password: undefined,
+                      }));
+                    }
+                  }}
                   disabled={isSubmitting}
                   error={Boolean(fieldErrors.current_password)}
                   hint={fieldErrors.current_password?.[0]}
+                  aria-invalid={Boolean(fieldErrors.current_password)}
+                  aria-describedby={
+                    fieldErrors.current_password
+                      ? 'current_password-hint'
+                      : undefined
+                  }
                 />
               </div>
 
@@ -134,12 +301,23 @@ export default function ChangePassword() {
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Enter your new password"
+                  placeholder={
+                    policy
+                      ? `Enter at least ${policy.min_length} characters`
+                      : 'Enter your new password'
+                  }
                   value={password}
-                  onChange={(event) => setPassword(event.target.value)}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    clearPasswordErrors();
+                  }}
                   disabled={isSubmitting}
                   error={Boolean(fieldErrors.password)}
                   hint={fieldErrors.password?.[0]}
+                  aria-invalid={Boolean(fieldErrors.password)}
+                  aria-describedby={
+                    fieldErrors.password ? 'password-hint' : undefined
+                  }
                 />
               </div>
 
@@ -154,12 +332,25 @@ export default function ChangePassword() {
                   type="password"
                   placeholder="Confirm your new password"
                   value={passwordConfirmation}
-                  onChange={(event) =>
-                    setPasswordConfirmation(event.target.value)
-                  }
+                  onChange={(event) => {
+                    setPasswordConfirmation(event.target.value);
+
+                    if (fieldErrors.password_confirmation) {
+                      setFieldErrors((errors) => ({
+                        ...errors,
+                        password_confirmation: undefined,
+                      }));
+                    }
+                  }}
                   disabled={isSubmitting}
                   error={Boolean(fieldErrors.password_confirmation)}
                   hint={fieldErrors.password_confirmation?.[0]}
+                  aria-invalid={Boolean(fieldErrors.password_confirmation)}
+                  aria-describedby={
+                    fieldErrors.password_confirmation
+                      ? 'password_confirmation-hint'
+                      : undefined
+                  }
                 />
               </div>
 

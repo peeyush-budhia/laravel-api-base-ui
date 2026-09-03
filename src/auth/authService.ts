@@ -1,6 +1,7 @@
 import { apiClient } from '../api/client';
 import { endpoints } from '../api/endpoints';
 import type { ApiResponse } from '../api/types';
+import type { PasswordPolicy } from '../types/passwordPolicy';
 import type {
   AuthUser,
   ChangePasswordData,
@@ -47,5 +48,13 @@ export const authService = {
 
   async changePassword(data: ChangePasswordData): Promise<void> {
     await apiClient.post<ApiResponse>(endpoints.auth.changePassword, data);
+  },
+
+  async getPasswordPolicy(): Promise<PasswordPolicy> {
+    const response = await apiClient.get<ApiResponse<PasswordPolicy>>(
+      endpoints.auth.passwordPolicy,
+    );
+
+    return response.data.data;
   },
 };
