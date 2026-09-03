@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { usersApi } from '../../api/users';
-import {
-  userStatusColors,
-  userStatusLabels,
-  type User,
-} from '../../types/user';
-import { useAuth } from '../../auth/useAuth';
+
 import { permissions } from '../../auth/permissions';
+import { useAuthorization } from '../../auth/useAuthorization';
+import { usersApi } from '../../api/users';
+import type { User } from '../../types/user';
+import { userStatusColors, userStatusLabels } from '../../types/user';
+import { routes } from '../../routes/routes';
+import { SUPER_ADMIN_ROLE } from '../../constants/roles';
+import { getApiErrorMessage } from '../../utils/apiErrorUtils';
+import { formatDateTime } from '../../utils/dateTimeUtils';
+
+import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
 import Badge from '../../components/ui/badge/Badge';
-import { routes } from '../../routes/routes';
-
-import { formatDateTime } from '../../utils/dateTimeUtils';
 
 function UserAvatar({ user }: { user: User }) {
   if (user.avatar) {
@@ -53,36 +56,58 @@ function DetailItem({
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>();
 
+  const { can } = useAuthorization();
+
+  const canViewUsers = can(permissions.users.view);
+  const canUpdateUsers = can(permissions.users.update);
+
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const { can } = useAuth();
 
-  const canViewUsers = can(permissions.usersView);
-  const canUpdateUsers = can(permissions.usersUpdate);
+  const editableUser =
+    canUpdateUsers && user && user.role !== SUPER_ADMIN_ROLE ? user : null;
+
+  const loadUser = useCallback(async () => {
+    if (!id || !canViewUsers) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await usersApi.show(id);
+
+      setUser(response);
+    } catch (error: unknown) {
+      setUser(null);
+
+      setError(
+        getApiErrorMessage(
+          error,
+          'Unable to load user details. Please try again.',
+        ),
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, canViewUsers]);
 
   useEffect(() => {
     if (!id || !canViewUsers) {
       return;
     }
 
-    const loadUser = async () => {
-      setIsLoading(true);
-      setError('');
+    const timer = window.setTimeout(() => {
+      void loadUser();
+    }, 0);
 
-      try {
-        const response = await usersApi.show(id);
-        setUser(response);
-      } catch {
-        setUser(null);
-        setError('Unable to load user details.');
-      } finally {
-        setIsLoading(false);
-      }
+    return () => {
+      window.clearTimeout(timer);
     };
+  }, [id, canViewUsers, loadUser]);
 
-    void loadUser();
-  }, [id, canViewUsers]);
   if (!canViewUsers) {
     return (
       <>
@@ -107,6 +132,7 @@ export default function UserDetails() {
       </>
     );
   }
+
   return (
     <>
       <PageMeta
@@ -127,9 +153,9 @@ export default function UserDetails() {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {canUpdateUsers && user && (
+            {editableUser && (
               <Link
-                to={routes.users.edit(user.id)}
+                to={routes.users.edit(editableUser.id)}
                 className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
               >
                 Edit User
@@ -137,7 +163,7 @@ export default function UserDetails() {
             )}
 
             <Link
-              to="/users"
+              to={routes.users.index}
               className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
             >
               ← Back to Users
@@ -145,34 +171,31 @@ export default function UserDetails() {
           </div>
         </div>
 
-        {isLoading && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-            <div className="animate-pulse space-y-6">
-              <div className="flex items-center gap-5">
-                <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800" />
-
-                <div className="space-y-3">
-                  <div className="h-5 w-48 rounded bg-gray-100 dark:bg-gray-800" />
-                  <div className="h-4 w-64 rounded bg-gray-100 dark:bg-gray-800" />
-                </div>
-              </div>
-
-              <div className="grid gap-6 border-t border-gray-100 pt-6 sm:grid-cols-2 dark:border-gray-800">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index}>
-                    <div className="h-4 w-24 rounded bg-gray-100 dark:bg-gray-800" />
-                    <div className="mt-2 h-5 w-40 rounded bg-gray-100 dark:bg-gray-800" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        {isLoading && <LoadingState message="Loading user details..." />}
 
         {!isLoading && error && (
-          <div className="rounded-2xl border border-error-200 bg-error-50 p-5 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-            {error}
-          </div>
+          <ErrorState
+            title="Unable to load user"
+            message={error}
+            onRetry={() => {
+              void loadUser();
+            }}
+          />
+        )}
+
+        {!isLoading && !error && !user && (
+          <EmptyState
+            title="User not found"
+            message="The requested user could not be found."
+            action={
+              <Link
+                to={routes.users.index}
+                className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600"
+              >
+                Back to Users
+              </Link>
+            }
+          />
         )}
 
         {!isLoading && !error && user && (
@@ -238,7 +261,7 @@ export default function UserDetails() {
                 />
 
                 <DetailItem
-                  label="Email Verifiled"
+                  label="Email Verified"
                   value={
                     user.email_verified_at ? (
                       <Badge size="sm" color="success">

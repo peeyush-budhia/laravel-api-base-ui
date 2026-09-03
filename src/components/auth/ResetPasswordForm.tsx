@@ -1,13 +1,19 @@
 import type React from 'react';
-import { useState } from 'react';
-import axios from 'axios';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
 import { EyeCloseIcon, EyeIcon } from '../../icons';
-import type { ApiErrorResponse } from '../../api/types';
 import { authService } from '../../auth/authService';
 import { routes } from '../../routes/routes';
+import { usePasswordPolicy } from '../../hooks/usePasswordPolicy';
+import { validatePassword } from '../../utils/passwordValidationUtils';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
+import ErrorState from '../common/ErrorState';
+import LoadingState from '../common/LoadingState';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
 import Button from '../ui/button/Button';
@@ -16,12 +22,21 @@ interface ValidationErrors {
   token?: string[];
   email?: string[];
   password?: string[];
+  password_confirmation?: string[];
 }
 
 export default function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
+
   const token = searchParams.get('token') ?? '';
   const email = searchParams.get('email') ?? '';
+
+  const {
+    policy,
+    isLoading: isPolicyLoading,
+    error: policyError,
+    reload: reloadPasswordPolicy,
+  } = usePasswordPolicy();
 
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -35,12 +50,109 @@ export default function ResetPasswordForm() {
   const [generalError, setGeneralError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const passwordValidation = useMemo(() => {
+    if (!policy) {
+      return null;
+    }
+
+    return validatePassword(password, policy);
+  }, [password, policy]);
+
+  const clearFieldError = (field: keyof ValidationErrors) => {
+    setFieldErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [field]: undefined,
+      };
+    });
+
+    if (generalError) {
+      setGeneralError('');
+    }
+  };
+
+  const validate = (): ValidationErrors => {
+    const errors: ValidationErrors = {};
+
+    if (!password.trim()) {
+      errors.password = ['New password is required.'];
+    } else if (policy && passwordValidation && !passwordValidation.valid) {
+      const messages: string[] = [];
+
+      if (!passwordValidation.minLength) {
+        messages.push(
+          `Password must be at least ${policy.min_length} characters.`,
+        );
+      }
+
+      if (policy.require_mixed_case && !passwordValidation.mixedCase) {
+        messages.push(
+          'Password must contain at least one uppercase and one lowercase letter.',
+        );
+      }
+
+      if (policy.require_numbers && !passwordValidation.numbers) {
+        messages.push('Password must contain at least one number.');
+      }
+
+      if (policy.require_symbols && !passwordValidation.symbols) {
+        messages.push('Password must contain at least one symbol.');
+      }
+
+      if (messages.length > 0) {
+        errors.password = messages;
+      }
+    }
+
+    if (!passwordConfirmation.trim()) {
+      errors.password_confirmation = ['Please confirm your new password.'];
+    } else if (password !== passwordConfirmation) {
+      errors.password_confirmation = ['Passwords do not match.'];
+    }
+
+    return errors;
+  };
+
+  const clearPasswordErrors = () => {
+    setFieldErrors((current) => {
+      if (!current.password && !current.password_confirmation) {
+        return current;
+      }
+
+      return {
+        ...current,
+        password: undefined,
+        password_confirmation: undefined,
+      };
+    });
+
+    if (generalError) {
+      setGeneralError('');
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     setIsSubmitting(true);
     setFieldErrors({});
     setGeneralError('');
+
+    const validationErrors = validate();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       await authService.resetPassword({
@@ -51,38 +163,41 @@ export default function ResetPasswordForm() {
       });
 
       setIsSuccess(true);
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        const response = error.response;
+    } catch (error: unknown) {
+      const apiError = getApiFieldErrors(error);
 
-        if (response?.status === 422) {
-          const apiError = response.data;
+      if (Object.keys(apiError).length > 0) {
+        const errors: ValidationErrors = {
+          token: apiError.token,
+          email: apiError.email,
+          password: apiError.password,
+          password_confirmation: apiError.password_confirmation,
+        };
 
-          setFieldErrors({
-            token: apiError.errors?.token,
-            email: apiError.errors?.email,
-            password: apiError.errors?.password,
-          });
+        setFieldErrors(errors);
 
-          if (
-            !apiError.errors?.token &&
-            !apiError.errors?.email &&
-            !apiError.errors?.password &&
-            apiError.message
-          ) {
-            setGeneralError(apiError.message);
-          }
+        const hasFieldErrors = Object.values(errors).some(
+          (value) => value && value.length > 0,
+        );
 
-          return;
+        if (!hasFieldErrors) {
+          setGeneralError(
+            getApiErrorMessage(
+              error,
+              'Unable to reset your password. Please try again.',
+            ),
+          );
         }
 
-        if (response?.data?.message) {
-          setGeneralError(response.data.message);
-          return;
-        }
+        return;
       }
 
-      setGeneralError('Unable to reset your password. Please try again.');
+      setGeneralError(
+        getApiErrorMessage(
+          error,
+          'Unable to reset your password. Please try again.',
+        ),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +206,7 @@ export default function ResetPasswordForm() {
   if (isSuccess) {
     return (
       <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto"></div>
+        <div className="w-full max-w-md pt-10 mx-auto" />
 
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
@@ -106,7 +221,10 @@ export default function ResetPasswordForm() {
               </p>
             </div>
 
-            <div className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400">
+            <div
+              role="status"
+              className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400"
+            >
               Your password has been updated successfully.
             </div>
 
@@ -125,7 +243,7 @@ export default function ResetPasswordForm() {
   if (!token || !email) {
     return (
       <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto"></div>
+        <div className="w-full max-w-md pt-10 mx-auto" />
 
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
@@ -154,7 +272,7 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="flex flex-col flex-1">
-      <div className="w-full max-w-md pt-10 mx-auto"></div>
+      <div className="w-full max-w-md pt-10 mx-auto" />
 
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
@@ -169,15 +287,91 @@ export default function ResetPasswordForm() {
           </div>
 
           {generalError && (
-            <div className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
+            <div
+              role="alert"
+              className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400"
+            >
               {generalError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          {isPolicyLoading ? (
+            <div className="mb-6">
+              <LoadingState message="Loading password requirements..." />
+            </div>
+          ) : policyError ? (
+            <div className="mb-6">
+              <ErrorState
+                message={policyError}
+                onRetry={() => {
+                  void reloadPasswordPolicy();
+                }}
+              />
+            </div>
+          ) : policy ? (
+            <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/30">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Password requirements
+              </p>
+
+              <ul className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                <li
+                  className={
+                    passwordValidation?.minLength
+                      ? 'text-success-500'
+                      : undefined
+                  }
+                >
+                  {passwordValidation?.minLength ? '✓' : '•'} At least{' '}
+                  {policy.min_length} characters
+                </li>
+
+                {policy.require_mixed_case && (
+                  <li
+                    className={
+                      passwordValidation?.mixedCase
+                        ? 'text-success-500'
+                        : undefined
+                    }
+                  >
+                    {passwordValidation?.mixedCase ? '✓' : '•'} One uppercase
+                    and one lowercase letter
+                  </li>
+                )}
+
+                {policy.require_numbers && (
+                  <li
+                    className={
+                      passwordValidation?.numbers
+                        ? 'text-success-500'
+                        : undefined
+                    }
+                  >
+                    {passwordValidation?.numbers ? '✓' : '•'} At least one
+                    number
+                  </li>
+                )}
+
+                {policy.require_symbols && (
+                  <li
+                    className={
+                      passwordValidation?.symbols
+                        ? 'text-success-500'
+                        : undefined
+                    }
+                  >
+                    {passwordValidation?.symbols ? '✓' : '•'} At least one
+                    symbol
+                  </li>
+                )}
+              </ul>
+            </div>
+          ) : null}
+
+          <form onSubmit={handleSubmit} noValidate>
             <div className="space-y-6">
               <div>
-                <Label>
+                <Label htmlFor="password">
                   New Password <span className="text-error-500">*</span>
                 </Label>
 
@@ -186,12 +380,23 @@ export default function ResetPasswordForm() {
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your new password"
+                    placeholder={
+                      policy
+                        ? `Enter at least ${policy.min_length} characters`
+                        : 'Enter your new password'
+                    }
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      clearPasswordErrors();
+                    }}
                     disabled={isSubmitting}
                     error={Boolean(fieldErrors.password)}
                     hint={fieldErrors.password?.[0]}
+                    aria-invalid={Boolean(fieldErrors.password)}
+                    aria-describedby={
+                      fieldErrors.password ? 'password-hint' : undefined
+                    }
                   />
 
                   <button
@@ -213,7 +418,7 @@ export default function ResetPasswordForm() {
               </div>
 
               <div>
-                <Label>
+                <Label htmlFor="password_confirmation">
                   Confirm Password <span className="text-error-500">*</span>
                 </Label>
 
@@ -224,12 +429,19 @@ export default function ResetPasswordForm() {
                     type={showPasswordConfirmation ? 'text' : 'password'}
                     placeholder="Confirm your new password"
                     value={passwordConfirmation}
-                    onChange={(event) =>
-                      setPasswordConfirmation(event.target.value)
-                    }
+                    onChange={(event) => {
+                      setPasswordConfirmation(event.target.value);
+                      clearFieldError('password_confirmation');
+                    }}
                     disabled={isSubmitting}
-                    error={Boolean(fieldErrors.password)}
-                    hint={fieldErrors.password?.[0]}
+                    error={Boolean(fieldErrors.password_confirmation)}
+                    hint={fieldErrors.password_confirmation?.[0]}
+                    aria-invalid={Boolean(fieldErrors.password_confirmation)}
+                    aria-describedby={
+                      fieldErrors.password_confirmation
+                        ? 'password_confirmation-hint'
+                        : undefined
+                    }
                   />
 
                   <button

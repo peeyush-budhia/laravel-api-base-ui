@@ -4,8 +4,10 @@ import { ApexOptions } from 'apexcharts';
 import flatpickr from 'flatpickr';
 import ChartTab from '../common/ChartTab';
 import { CalenderIcon } from '../../icons';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function StatisticsChart() {
+  const { theme } = useTheme();
   const datePickerRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function StatisticsChart() {
     colors: ['#465FFF', '#9CB9FF'], // Define line colors
     chart: {
       fontFamily: 'Outfit, sans-serif',
+      foreColor: theme === 'dark' ? '#98A2B3' : '#667085',
       height: 310,
       type: 'line', // Set the chart type to 'line'
       toolbar: {
@@ -121,7 +124,7 @@ export default function StatisticsChart() {
       labels: {
         style: {
           fontSize: '12px', // Adjust font size for y-axis labels
-          colors: ['#6B7280'], // Color of the labels
+          colors: [theme === 'dark' ? '#98A2B3' : '#667085'],
         },
       },
       title: {

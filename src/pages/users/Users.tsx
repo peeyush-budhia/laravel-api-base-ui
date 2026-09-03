@@ -1,28 +1,34 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
+import { permissions } from '../../auth/permissions';
+import { useAuthorization } from '../../auth/useAuthorization';
 import { usersApi } from '../../api/users';
+import type { PaginationMeta } from '../../types/pagination';
 import { type User, type UserTrashedFilter } from '../../types/user';
+import { routes } from '../../routes/routes';
+import { getApiErrorMessage } from '../../utils/apiErrorUtils';
+
+import EmptyState from '../../components/common/EmptyState';
+import ErrorState from '../../components/common/ErrorState';
+import PageMeta from '../../components/common/PageMeta';
+import Pagination from '../../components/common/Pagination';
+import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
 import UserFilters from '../../components/users/UserFilters';
 import UserTable from '../../components/users/UserTable';
-import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
-
-import Pagination from '../../components/common/Pagination';
-import type { PaginationMeta } from '../../types/pagination';
-
-import { useAuth } from '../../auth/useAuth';
-import { permissions } from '../../auth/permissions';
-
-import PageMeta from '../../components/common/PageMeta';
-
-import { routes } from '../../routes/routes';
-
-const PER_PAGE = 15;
 
 export default function Users() {
+  const { can } = useAuthorization();
+
+  const canViewUsers = can(permissions.users.view);
+  const canCreateUsers = can(permissions.users.create);
+  const canUpdateUsers = can(permissions.users.update);
+  const canDeleteUsers = can(permissions.users.delete);
+
   const [users, setUsers] = useState<User[]>([]);
 
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(15);
 
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -44,16 +50,9 @@ export default function Users() {
   const [isForceDeleting, setIsForceDeleting] = useState(false);
   const [forceDeleteError, setForceDeleteError] = useState('');
 
-  const { can } = useAuth();
-
-  const canViewUsers = can(permissions.usersView);
-  const canCreateUsers = can(permissions.usersCreate);
-  const canUpdateUsers = can(permissions.usersUpdate);
-  const canDeleteUsers = can(permissions.usersDelete);
-
   const [meta, setMeta] = useState<PaginationMeta>({
     current_page: 1,
-    per_page: PER_PAGE,
+    per_page: perPage,
     total: 0,
     last_page: 1,
     from: null,
@@ -77,7 +76,7 @@ export default function Users() {
     try {
       const response = await usersApi.list({
         page,
-        perPage: PER_PAGE,
+        perPage,
         search,
         sort,
         direction,
@@ -85,15 +84,17 @@ export default function Users() {
       });
 
       setUsers(response.data);
-
       setMeta(response.meta);
-    } catch {
+    } catch (error: unknown) {
       setUsers([]);
-      setError('Unable to load users. Please try again.');
+
+      setError(
+        getApiErrorMessage(error, 'Unable to load users. Please try again.'),
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [page, search, sort, direction, trashed]);
+  }, [page, perPage, search, sort, direction, trashed]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -104,6 +105,11 @@ export default function Users() {
       window.clearTimeout(timer);
     };
   }, [loadUsers]);
+
+  function handlePerPageChange(value: number) {
+    setPerPage(value);
+    setPage(1);
+  }
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -139,6 +145,7 @@ export default function Users() {
   /*
    * Delete
    */
+
   function openDeleteConfirmation(user: User) {
     setDeleteError('');
     setDeleteUser(user);
@@ -168,18 +175,8 @@ export default function Users() {
 
       await loadUsers();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-        }
-      ).response;
-
       setDeleteError(
-        response?.data?.message ?? 'Unable to delete user. Please try again.',
+        getApiErrorMessage(error, 'Unable to delete user. Please try again.'),
       );
     } finally {
       setIsDeleting(false);
@@ -189,6 +186,7 @@ export default function Users() {
   /*
    * Restore
    */
+
   function openRestoreConfirmation(user: User) {
     setRestoreError('');
     setRestoreUser(user);
@@ -218,26 +216,16 @@ export default function Users() {
 
       await loadUsers();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-        }
-      ).response;
-
       setRestoreError(
-        response?.data?.message ?? 'Unable to restore user. Please try again.',
+        getApiErrorMessage(error, 'Unable to restore user. Please try again.'),
       );
     } finally {
       setIsRestoring(false);
     }
   }
 
-  /**
-   * Force delete user
+  /*
+   * Force delete
    */
 
   function openForceDeleteConfirmation(user: User) {
@@ -269,25 +257,16 @@ export default function Users() {
 
       await loadUsers();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-        }
-      ).response;
-
       setForceDeleteError(
-        response?.data?.message ??
+        getApiErrorMessage(
+          error,
           'Unable to permanently delete user. Please try again.',
+        ),
       );
     } finally {
       setIsForceDeleting(false);
     }
   }
-  // End force delete user
 
   if (!canViewUsers) {
     return (
@@ -343,46 +322,41 @@ export default function Users() {
               onSearchSubmit={handleSearchSubmit}
               onClearSearch={handleClearSearch}
               onTrashedChange={handleTrashedChange}
+              perPage={perPage}
+              onPerPageChange={handlePerPageChange}
             />
           </div>
-          {/* General Error */}
-          {error && (
-            <div className="p-5">
-              <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-                {error}
-              </div>
 
-              <button
-                type="button"
-                onClick={() => void loadUsers()}
-                className="mt-3 text-sm font-medium text-brand-500 hover:text-brand-600"
-              >
-                Try again
-              </button>
-            </div>
-          )}
-
-          {!error && (
+          {error ? (
+            <ErrorState
+              title="Unable to load users"
+              message={error}
+              onRetry={() => {
+                void loadUsers();
+              }}
+            />
+          ) : !isLoading && users.length === 0 ? (
+            <EmptyState
+              title="No users found"
+              message="There are no user entries matching your current filters."
+            />
+          ) : (
             <>
-              {/* Users Table */}
-              <div className="overflow-x-auto">
-                <UserTable
-                  users={users}
-                  isLoading={isLoading}
-                  sort={sort}
-                  direction={direction}
-                  trashed={trashed}
-                  canView={canViewUsers}
-                  canUpdate={canUpdateUsers}
-                  canDelete={canDeleteUsers}
-                  onSort={handleSort}
-                  onDelete={openDeleteConfirmation}
-                  onRestore={openRestoreConfirmation}
-                  onForceDelete={openForceDeleteConfirmation}
-                />
-              </div>
+              <UserTable
+                users={users}
+                isLoading={isLoading}
+                sort={sort}
+                direction={direction}
+                trashed={trashed}
+                canView={canViewUsers}
+                canUpdate={canUpdateUsers}
+                canDelete={canDeleteUsers}
+                onSort={handleSort}
+                onDelete={openDeleteConfirmation}
+                onRestore={openRestoreConfirmation}
+                onForceDelete={openForceDeleteConfirmation}
+              />
 
-              {/* Pagination */}
               {!isLoading && (
                 <Pagination
                   meta={meta}
@@ -402,7 +376,9 @@ export default function Users() {
         isSubmitting={isDeleting}
         error={deleteError}
         onClose={closeDeleteConfirmation}
-        onConfirm={() => void handleDeleteUser()}
+        onConfirm={() => {
+          void handleDeleteUser();
+        }}
       />
 
       <UserActionConfirmationModal
@@ -411,7 +387,9 @@ export default function Users() {
         isSubmitting={isForceDeleting}
         error={forceDeleteError}
         onClose={closeForceDeleteConfirmation}
-        onConfirm={() => void handleForceDeleteUser()}
+        onConfirm={() => {
+          void handleForceDeleteUser();
+        }}
       />
 
       <UserActionConfirmationModal
@@ -420,7 +398,9 @@ export default function Users() {
         isSubmitting={isRestoring}
         error={restoreError}
         onClose={closeRestoreConfirmation}
-        onConfirm={() => void handleRestoreUser()}
+        onConfirm={() => {
+          void handleRestoreUser();
+        }}
       />
     </>
   );

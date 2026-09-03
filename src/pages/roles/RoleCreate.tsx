@@ -10,18 +10,22 @@ import { rolesApi } from '../../api/roles';
 import type { Permission } from '../../types/role';
 
 import { routes } from '../../routes/routes';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
-import { useAuth } from '../../auth/useAuth';
 import { permissions as authPermissions } from '../../auth/permissions';
+import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function RoleCreate() {
   const navigate = useNavigate();
 
-  const { can } = useAuth();
+  const { can } = useAuthorization();
 
-  const canCreateRoles = can(authPermissions.rolesCreate);
+  const canCreateRoles = can(authPermissions.roles.create);
 
-  const canManageRolePermissions = can(authPermissions.rolesManagePermissions);
+  const canManageRolePermissions = can(authPermissions.roles.managePermissions);
 
   const [name, setName] = useState('');
 
@@ -133,16 +137,7 @@ export default function RoleCreate() {
         replace: true,
       });
     } catch (requestError: unknown) {
-      const response = requestError as {
-        response?: {
-          data?: {
-            message?: string;
-            errors?: Record<string, string[]>;
-          };
-        };
-      };
-
-      const validationErrors = response.response?.data?.errors;
+      const validationErrors = getApiFieldErrors(requestError);
 
       const roleNameValidationError = validationErrors?.name?.[0];
 
@@ -150,8 +145,10 @@ export default function RoleCreate() {
         setNameError(roleNameValidationError);
       } else {
         setError(
-          response.response?.data?.message ??
+          getApiErrorMessage(
+            requestError,
             'Unable to create role. Please try again.',
+          ),
         );
       }
     } finally {

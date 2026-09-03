@@ -1,5 +1,3 @@
-import type { Permission } from './permissions';
-
 export type AuthUserStatus = 'active' | 'inactive' | 'suspended';
 
 export interface AuthUser {
@@ -38,7 +36,6 @@ export interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  can: (permission: Permission) => boolean;
 }
 
 export interface ResetPasswordData {

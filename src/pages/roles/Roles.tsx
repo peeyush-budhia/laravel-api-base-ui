@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
+import LoadingState from '../../components/common/LoadingState';
+import ErrorState from '../../components/common/ErrorState';
+import { getApiErrorMessage } from '../../utils/apiErrorUtils';
+import EmptyState from '../../components/common/EmptyState';
+
 import { rolesApi } from '../../api/roles';
 
 import type { Role } from '../../types/role';
 import type { PaginationMeta } from '../../types/pagination';
 
-import { useAuth } from '../../auth/useAuth';
 import { permissions } from '../../auth/permissions';
 
 import PageMeta from '../../components/common/PageMeta';
@@ -17,20 +21,26 @@ import RoleTable from '../../components/roles/RoleTable';
 import RoleActionConfirmationModal from '../../components/roles/RoleActionConfirmationModal';
 
 import { routes } from '../../routes/routes';
-
-const PER_PAGE = 15;
+import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function Roles() {
-  const { can } = useAuth();
+  const { can } = useAuthorization();
 
-  const canViewRoles = can(permissions.rolesView);
-  const canCreateRoles = can(permissions.rolesCreate);
-  const canUpdateRoles = can(permissions.rolesUpdate);
-  const canDeleteRoles = can(permissions.rolesDelete);
-  const canManageRolePermissions = can(permissions.rolesManagePermissions);
+  const canViewRoles = can(permissions.roles.view);
+  const canCreateRoles = can(permissions.roles.create);
+  const canUpdateRoles = can(permissions.roles.update);
+  const canDeleteRoles = can(permissions.roles.delete);
+  const canManageRolePermissions = can(permissions.roles.managePermissions);
+
   const [roles, setRoles] = useState<Role[]>([]);
 
   const [page, setPage] = useState(1);
+
+  const [perPage, setPerPage] = useState(15);
+  const handlePerPageChange = (value: number) => {
+    setPerPage(value);
+    setPage(1);
+  };
 
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -40,7 +50,7 @@ export default function Roles() {
 
   const [meta, setMeta] = useState<PaginationMeta>({
     current_page: 1,
-    per_page: PER_PAGE,
+    per_page: perPage,
     total: 0,
     last_page: 1,
     from: null,
@@ -71,7 +81,7 @@ export default function Roles() {
     try {
       const response = await rolesApi.list({
         page,
-        perPage: PER_PAGE,
+        perPage: perPage,
         search,
         sort,
         direction,
@@ -79,13 +89,15 @@ export default function Roles() {
 
       setRoles(response.data);
       setMeta(response.meta);
-    } catch {
+    } catch (error: unknown) {
       setRoles([]);
-      setError('Unable to load roles. Please try again.');
+      setError(
+        getApiErrorMessage(error, 'Unable to load roles. Please try again.'),
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [page, search, sort, direction]);
+  }, [page, perPage, search, sort, direction]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -161,18 +173,8 @@ export default function Roles() {
 
       await loadRoles();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-            };
-          };
-        }
-      ).response;
-
       setDeleteError(
-        response?.data?.message ?? 'Unable to delete role. Please try again.',
+        getApiErrorMessage(error, 'Unable to delete role. Please try again.'),
       );
     } finally {
       setIsDeleting(false);
@@ -243,24 +245,15 @@ export default function Roles() {
               onSearchInputChange={setSearchInput}
               onSearchSubmit={handleSearchSubmit}
               onClearSearch={handleClearSearch}
+              perPage={perPage}
+              onPerPageChange={handlePerPageChange}
             />
           </div>
 
+          {isLoading && <LoadingState message="Loading roles..." />}
           {/* General Error */}
           {error && (
-            <div className="p-5">
-              <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-                {error}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => void loadRoles()}
-                className="mt-3 text-sm font-medium text-brand-500 hover:text-brand-600"
-              >
-                Try again
-              </button>
-            </div>
+            <ErrorState message={error} onRetry={() => void loadRoles()} />
           )}
 
           {!error && (
@@ -291,6 +284,12 @@ export default function Roles() {
                 />
               )}
             </>
+          )}
+          {!isLoading && !error && roles.length === 0 && (
+            <EmptyState
+              title="No roles found"
+              message="There are no roles matching your current filters."
+            />
           )}
         </div>
       </div>

@@ -4,12 +4,15 @@ import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { MoreDotIcon } from '../../icons';
 import { useState } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function MonthlySalesChart() {
+  const { theme } = useTheme();
   const options: ApexOptions = {
     colors: ['#465fff'],
     chart: {
       fontFamily: 'Outfit, sans-serif',
+      foreColor: theme === 'dark' ? '#98A2B3' : '#667085',
       type: 'bar',
       height: 180,
       toolbar: {

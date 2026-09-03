@@ -1,5 +1,33 @@
 # Release Notes
 
+## v0.8.0
+
+Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
+
+### Testing
+
+- Added a Vitest test setup with jsdom and shared test setup.
+- Added API service tests for auth, users, roles, profile, dashboard, and audit logs.
+- Added route and authorization tests.
+- Added password policy and validation tests.
+- Added component and page tests for key auth flows.
+
+### UX and UI States
+
+- Added reusable loading, error, and empty state components.
+- Improved dashboard, user, role, audit log, and profile screens to use shared states.
+- Improved form validation feedback for password and form-driven screens.
+
+### Data Integration
+
+- Added real dashboard API integration.
+- Added audit log API integration.
+- Added password policy API handling for password-related forms.
+
+### Cleanup
+
+- Removed unused settings and signup screens from the routed application.
+
 ## v0.7.0
 
 The `v0.7.0` frontend work aligns the UI with the Laravel API Base documentation and API integration structure.

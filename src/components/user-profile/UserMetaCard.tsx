@@ -2,6 +2,10 @@ import { ChangeEvent, useRef, useState } from 'react';
 
 import { useAuth } from '../../auth/useAuth';
 import { profile } from '../../api/profile';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 import { userStatusColors, userStatusLabels } from '../../types/user';
 import Badge from '../ui/badge/Badge';
 
@@ -60,23 +64,10 @@ export default function UserMetaCard() {
       await profile.updateAvatar(file);
       await refreshUser();
     } catch (error: unknown) {
-      const response = (
-        error as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: {
-                avatar?: string[];
-              };
-            };
-          };
-        }
-      ).response;
-
+      const errors = getApiFieldErrors(error);
       setAvatarError(
-        response?.data?.errors?.avatar?.[0] ??
-          response?.data?.message ??
-          'Unable to update your avatar.',
+        errors.avatar?.[0] ??
+          getApiErrorMessage(error, 'Unable to update your avatar.'),
       );
     } finally {
       setIsUploading(false);

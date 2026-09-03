@@ -1,11 +1,13 @@
 import type React from 'react';
 import { useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router';
 
-import type { ApiErrorResponse } from '../../api/types';
 import { authService } from '../../auth/authService';
 import { routes } from '../../routes/routes';
+import {
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from '../../utils/apiErrorUtils';
 
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
@@ -35,31 +37,33 @@ export default function ForgotPasswordForm() {
       await authService.forgotPassword(email);
 
       setIsSuccess(true);
-    } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        const response = error.response;
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(
+        error,
+        'Unable to process your request. Please try again.',
+      );
 
-        if (response?.status === 422) {
-          const apiError = response.data;
+      /*
+       * apiErrorUtils already normalizes API errors.
+       *
+       * If field-level validation errors are available, use them
+       * directly instead of displaying the same message as a
+       * general error.
+       */
+      const errors = getApiFieldErrors(error);
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors({
+          email: errors.email,
+        });
 
-          setFieldErrors({
-            email: apiError.errors?.email,
-          });
-
-          if (!apiError.errors?.email && apiError.message) {
-            setGeneralError(apiError.message);
-          }
-
-          return;
+        if (!errors.email) {
+          setGeneralError(message);
         }
 
-        if (response?.data?.message) {
-          setGeneralError(response.data.message);
-          return;
-        }
+        return;
       }
 
-      setGeneralError('Unable to process your request. Please try again.');
+      setGeneralError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +72,7 @@ export default function ForgotPasswordForm() {
   if (isSuccess) {
     return (
       <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto"></div>
+        <div className="w-full max-w-md pt-10 mx-auto" />
 
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
@@ -83,7 +87,10 @@ export default function ForgotPasswordForm() {
               </p>
             </div>
 
-            <div className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400">
+            <div
+              role="status"
+              className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400"
+            >
               Please check your email for instructions to reset your password.
             </div>
 
@@ -101,7 +108,7 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="flex flex-col flex-1">
-      <div className="w-full max-w-md pt-10 mx-auto"></div>
+      <div className="w-full max-w-md pt-10 mx-auto" />
 
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
@@ -117,15 +124,18 @@ export default function ForgotPasswordForm() {
           </div>
 
           {generalError && (
-            <div className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
+            <div
+              role="alert"
+              className="mb-5 rounded-lg border border-error-500/30 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400"
+            >
               {generalError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="space-y-6">
               <div>
-                <Label>
+                <Label htmlFor="email">
                   Email <span className="text-error-500">*</span>
                 </Label>
 
@@ -135,10 +145,27 @@ export default function ForgotPasswordForm() {
                   type="email"
                   placeholder="info@gmail.com"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+
+                    if (fieldErrors.email) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        email: undefined,
+                      }));
+                    }
+
+                    if (generalError) {
+                      setGeneralError('');
+                    }
+                  }}
                   disabled={isSubmitting}
                   error={Boolean(fieldErrors.email)}
                   hint={fieldErrors.email?.[0]}
+                  aria-invalid={Boolean(fieldErrors.email)}
+                  aria-describedby={
+                    fieldErrors.email ? 'email-hint' : undefined
+                  }
                 />
               </div>
 

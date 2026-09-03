@@ -10,12 +10,14 @@ import {
 
 import Badge from '../ui/badge/Badge';
 
+import { LoadingRows, SortableHeader } from '../common/Table';
+
 import type { Role } from '../../types/role';
 
-import { SUPER_ADMIN_ROLE } from '../../constants/roles';
 import { routes } from '../../routes/routes';
 
 import RoleActions from './RoleActions';
+
 import { formatDateTime } from '../../utils/dateTimeUtils';
 
 interface RoleTableProps {
@@ -31,58 +33,8 @@ interface RoleTableProps {
   canManagePermissions: boolean;
 
   onSort: (field: string) => void;
+
   onDelete: (role: Role) => void;
-}
-
-function LoadingRows() {
-  return (
-    <>
-      {Array.from({ length: 5 }).map((_, rowIndex) => (
-        <TableRow key={`loading-row-${rowIndex}`}>
-          {Array.from({ length: 5 }).map((__, cellIndex) => (
-            <TableCell key={`loading-cell-${cellIndex}`} className="px-5 py-4">
-              <div className="h-5 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-            </TableCell>
-          ))}
-        </TableRow>
-      ))}
-    </>
-  );
-}
-
-interface SortableHeaderProps {
-  field: string;
-  label: string;
-  sort: string;
-  direction: 'asc' | 'desc';
-  onSort: (field: string) => void;
-  className?: string;
-}
-
-function SortableHeader({
-  field,
-  label,
-  sort,
-  direction,
-  onSort,
-  className = '',
-}: SortableHeaderProps) {
-  return (
-    <TableCell
-      isHeader
-      className={`px-5 py-4 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400 ${className}`.trim()}
-    >
-      <button
-        type="button"
-        onClick={() => onSort(field)}
-        className="inline-flex items-center gap-1"
-      >
-        {label}
-
-        {sort === field && <span>{direction === 'asc' ? '↑' : '↓'}</span>}
-      </button>
-    </TableCell>
-  );
 }
 
 export default function RoleTable({
@@ -92,9 +44,8 @@ export default function RoleTable({
   direction,
   canView,
   canUpdate,
-  canManagePermissions,
   canDelete,
-
+  canManagePermissions,
   onSort,
   onDelete,
 }: RoleTableProps) {
@@ -109,7 +60,7 @@ export default function RoleTable({
               sort={sort}
               direction={direction}
               onSort={onSort}
-              className="min-w-[280px]"
+              className="min-w-[240px]"
             />
 
             <TableCell
@@ -123,14 +74,14 @@ export default function RoleTable({
               isHeader
               className="px-5 py-4 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400"
             >
-              Status
+              Created
             </TableCell>
 
             <TableCell
               isHeader
               className="px-5 py-4 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400"
             >
-              Created At
+              Updated
             </TableCell>
 
             <TableCell
@@ -143,72 +94,46 @@ export default function RoleTable({
         </TableHeader>
 
         <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {isLoading && <LoadingRows />}
+          {isLoading && <LoadingRows columns={5} />}
 
           {!isLoading &&
-            roles.map((role) => {
-              const isSuperAdmin = role.name === SUPER_ADMIN_ROLE;
+            roles.map((role) => (
+              <TableRow key={role.id}>
+                <TableCell className="px-5 py-4">
+                  <Link
+                    to={routes.roles.show(role.id)}
+                    className="text-sm font-medium text-gray-800 hover:text-brand-500 dark:text-white/90 dark:hover:text-brand-400"
+                  >
+                    {role.name}
+                  </Link>
+                </TableCell>
 
-              return (
-                <TableRow key={role.id}>
-                  <TableCell className="px-5 py-4">
-                    <div className="min-w-0">
-                      <Link
-                        to={routes.roles.show(role.id)}
-                        className="truncate text-sm font-medium text-gray-800 hover:text-brand-500 dark:text-white/90 dark:hover:text-brand-400"
-                      >
-                        {role.name}
-                      </Link>
-
-                      {isSuperAdmin && (
-                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          Protected system role
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                <TableCell className="px-5 py-4">
+                  <Badge size="sm" color="info">
                     {role.guard_name}
-                  </TableCell>
+                  </Badge>
+                </TableCell>
 
-                  <TableCell className="px-5 py-4">
-                    {isSuperAdmin ? (
-                      <Badge size="sm" color="warning">
-                        Protected
-                      </Badge>
-                    ) : (
-                      <Badge size="sm" color="success">
-                        Active
-                      </Badge>
-                    )}
-                  </TableCell>
+                <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  {formatDateTime(role.created_at)}
+                </TableCell>
 
-                  <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {formatDateTime(role.created_at)}
-                  </TableCell>
+                <TableCell className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  {formatDateTime(role.updated_at)}
+                </TableCell>
 
-                  <TableCell className="px-5 py-4 text-end">
-                    <RoleActions
-                      role={role}
-                      canView={canView}
-                      canUpdate={canUpdate}
-                      canDelete={canDelete}
-                      canManagePermissions={canManagePermissions}
-                      onDelete={onDelete}
-                    />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-
-          {!isLoading && roles.length === 0 && (
-            <TableRow>
-              <TableCell className="px-5 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                No roles found.
-              </TableCell>
-            </TableRow>
-          )}
+                <TableCell className="px-5 py-4 text-end">
+                  <RoleActions
+                    role={role}
+                    canView={canView}
+                    canUpdate={canUpdate}
+                    canDelete={canDelete}
+                    canManagePermissions={canManagePermissions}
+                    onDelete={onDelete}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>
