@@ -18,6 +18,7 @@ The frontend communicates with the versioned Laravel API provided by the backend
 
 Frontend documentation is maintained in this repository under `docs/`.
 
+- Current release: `v0.8.0`
 - [API Integration](docs/API.md)
 - [Development Guide](docs/DEVELOPMENT.md)
 - [Testing Guide](docs/TESTING.md)

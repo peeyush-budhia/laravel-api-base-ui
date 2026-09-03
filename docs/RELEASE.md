@@ -17,6 +17,7 @@ Current work on the frontend expands the project beyond API integration into tes
 - Added reusable loading, error, and empty state components.
 - Improved dashboard, user, role, audit log, and profile screens to use shared states.
 - Improved form validation feedback for password and form-driven screens.
+- Reviewed accessibility across major screens and tightened mobile dashboard behavior.
 
 ### Data Integration
 
