@@ -185,31 +185,6 @@ export default function UserEdit() {
     }
   }
 
-  if (!canUpdateUsers) {
-    return (
-      <>
-        <PageMeta title="Edit User" description="Edit application user" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to update users.
-          </p>
-
-          <Link
-            to={routes.users.index}
-            className="mt-4 inline-flex text-sm font-medium text-brand-500 hover:text-brand-600"
-          >
-            ← Back to Users
-          </Link>
-        </div>
-      </>
-    );
-  }
-
   if (isLoading) {
     return (
       <>

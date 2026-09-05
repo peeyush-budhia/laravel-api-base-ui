@@ -49,15 +49,15 @@
 
 - 3. Dashboard
   - [x] Improve dashboard integration with real backend data
-  - [ ] Review dashboard widgets for loading, empty, and error states
-  - [ ] Keep recent activity formatting consistent
-  - [ ] Verify dashboard permission and fallback behavior
+  - [x] Review dashboard widgets for loading, empty, and error states
+  - [x] Keep recent activity formatting consistent
+  - [x] Verify dashboard permission and fallback behavior
 
 - 4. Users
-  - [ ] Review permission-driven actions in user list, details, edit, and create flows
-  - [ ] Add confirmation for delete, restore, and force-delete actions
-  - [ ] Standardize notifications after user actions
-  - [ ] Check route guards and unauthorized states
+  - [x] Review permission-driven actions in user list, details, edit, and create flows
+  - [x] Add confirmation for delete, restore, and force-delete actions
+  - [x] Standardize notifications after user actions
+  - [x] Check route guards and unauthorized states
 
 - 5. Roles & Permissions
   - [ ] Review permission-driven actions in role list, details, edit, and create flows

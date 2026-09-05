@@ -11,6 +11,19 @@ Current work on the frontend expands the project beyond API integration into tes
 - Completed profile avatar, profile update, and password/security action cleanup.
 - Standardized success feedback with toast notifications in profile and password flows.
 
+### Dashboard
+
+- Reviewed dashboard widget states for loading, empty, and error handling.
+- Standardized recent activity formatting and dashboard fallback behavior.
+- Replaced dashboard metric placeholders with colored SVG icons.
+
+### Users
+
+- Reviewed permission-driven actions across the user list and detail flows.
+- Added confirmation dialogs for delete, restore, and permanent delete actions.
+- Standardized success notifications after user actions.
+- Centralized route guard behavior to redirect denied users to an allowed route.
+
 ### Testing
 
 - Added a Vitest test setup with jsdom and shared test setup.

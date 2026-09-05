@@ -1,6 +1,9 @@
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import type { DashboardAuditLog } from '../../types/dashboard';
-import { getUserDisplayName } from '../../utils/userNameUtils';
+import {
+  getDisplayName,
+  getResourceName,
+} from '../../utils/dashboardUtils';
 import Badge from '../ui/badge/Badge';
 import {
   Table,
@@ -30,7 +33,10 @@ export default function RecentAuditLogs({ logs }: RecentAuditLogsProps) {
       </div>
 
       {logs.length === 0 ? (
-        <EmptyState title="No audit logs found" message="" />
+        <EmptyState
+          title="No recent audit logs"
+          message="Audit activity will appear here once the backend records events."
+        />
       ) : (
         <div className="max-w-full overflow-x-auto">
           <Table>
@@ -87,19 +93,17 @@ export default function RecentAuditLogs({ logs }: RecentAuditLogsProps) {
                   <TableCell className="py-3">
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                        {log.user
-                          ? getUserDisplayName(log.user, 'System')
-                          : 'System'}
+                        {getDisplayName(log.user, 'System')}
                       </p>
 
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {log.auditable_type.split('\\').pop() ?? 'Unknown'}
+                        {log.user ? log.user.email : 'System action'}
                       </p>
                     </div>
                   </TableCell>
 
                   <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {log.auditable_type.split('\\').pop() ?? 'Unknown'}
+                    {getResourceName(log.auditable_type)}
                   </TableCell>
 
                   <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">

@@ -108,31 +108,6 @@ export default function UserDetails() {
     };
   }, [id, canViewUsers, loadUser]);
 
-  if (!canViewUsers) {
-    return (
-      <>
-        <PageMeta title="User Details" description="View user details" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to view user details.
-          </p>
-
-          <Link
-            to={routes.users.index}
-            className="mt-4 inline-flex rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white"
-          >
-            Back to Users
-          </Link>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <PageMeta
