@@ -5,9 +5,11 @@ import { useSidebar } from '../context/SidebarContext';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
 import UserDropdown from '../components/header/UserDropdown';
 import { routes } from '../routes/routes';
+import { healthApi } from '../api/health';
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
+  const [isHealthHealthy, setIsHealthHealthy] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
@@ -26,6 +28,24 @@ const AppHeader: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const loadHealth = async () => {
+      try {
+        const isHealthy = await healthApi.check();
+
+        if (!cancelled) {
+          setIsHealthHealthy(isHealthy);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsHealthHealthy(false);
+        }
+      }
+    };
+
+    void loadHealth();
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         event.preventDefault();
@@ -36,6 +56,7 @@ const AppHeader: React.FC = () => {
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      cancelled = true;
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -123,7 +144,17 @@ const AppHeader: React.FC = () => {
             </svg>
           </button>
 
-          <div className="hidden lg:block">{/* Show API Health */}</div>
+          <div className="hidden lg:block">
+            {isHealthHealthy && (
+              <div className="inline-flex items-center gap-2 rounded-sm border border-success-500/20 bg-success-500/5 px-3 py-1.5 text-sm font-medium text-success-600 dark:border-success-500/30 dark:text-success-400">
+                <span
+                  className="h-2.5 w-2.5 rounded-full bg-success-500"
+                  aria-hidden="true"
+                />
+                <span>System is healthy!</span>
+              </div>
+            )}
+          </div>
         </div>
         <div
           className={`${
