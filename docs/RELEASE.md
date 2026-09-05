@@ -4,6 +4,13 @@
 
 Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
 
+### Auth and Profile
+
+- Completed token lifecycle handling and root redirect stability.
+- Confirmed remember-me persistence behavior and invalid-session recovery.
+- Completed profile avatar, profile update, and password/security action cleanup.
+- Standardized success feedback with toast notifications in profile and password flows.
+
 ### Testing
 
 - Added a Vitest test setup with jsdom and shared test setup.

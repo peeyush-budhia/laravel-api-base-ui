@@ -44,6 +44,8 @@ export default function App() {
       <Routes>
         {/* Guest Routes */}
         <Route element={<GuestRoute />}>
+          <Route path="/" element={<SignIn />} />
+
           <Route path={routes.auth.signIn} element={<SignIn />} />
 
           <Route

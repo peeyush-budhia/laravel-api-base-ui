@@ -5,6 +5,7 @@ import LoadingState from '../../components/common/LoadingState';
 
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useToast } from '../../components/common/useToast';
 import RoleForm from '../../components/roles/RoleForm';
 
 import { rolesApi } from '../../api/roles';
@@ -24,6 +25,7 @@ import { useAuthorization } from '../../auth/useAuthorization';
 export default function RoleEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { can } = useAuthorization();
 
@@ -46,6 +48,8 @@ export default function RoleEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [error, setError] = useState('');
+  const [permissionsLoadError, setPermissionsLoadError] = useState('');
+  const [hasLoadedRole, setHasLoadedRole] = useState(false);
 
   const [nameError, setNameError] = useState('');
 
@@ -60,7 +64,9 @@ export default function RoleEdit() {
       try {
         setIsLoading(true);
         setError('');
+        setPermissionsLoadError('');
         setNameError('');
+        setHasLoadedRole(false);
 
         const role = await rolesApi.show(id);
 
@@ -69,39 +75,17 @@ export default function RoleEdit() {
         }
 
         setName(role.name);
-
-        /*
-         * Only load permission data when the current
-         * user has permission to manage permissions.
-         */
-        if (canManageRolePermissions) {
-          setIsLoadingPermissions(true);
-
-          const [allPermissions, rolePermissions] = await Promise.all([
-            rolesApi.allPermissions(),
-            rolesApi.permissions(id),
-          ]);
-
-          if (cancelled) {
-            return;
-          }
-
-          setPermissions(allPermissions);
-
-          setSelectedPermissions(
-            rolePermissions.map((permission) => permission.name),
-          );
-        }
+        setHasLoadedRole(true);
       } catch {
         if (cancelled) {
           return;
         }
 
+        setHasLoadedRole(false);
         setError('Unable to load role. Please try again.');
       } finally {
         if (!cancelled) {
           setIsLoading(false);
-          setIsLoadingPermissions(false);
         }
       }
     };
@@ -112,6 +96,54 @@ export default function RoleEdit() {
       cancelled = true;
     };
   }, [canEditRole, canManageRolePermissions, id]);
+
+  useEffect(() => {
+    if (!canManageRolePermissions || !id || !hasLoadedRole) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadPermissions = async () => {
+      setIsLoadingPermissions(true);
+      setPermissionsLoadError('');
+
+      try {
+        const [allPermissions, rolePermissions] = await Promise.all([
+          rolesApi.allPermissions(),
+          rolesApi.permissions(id),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        setPermissions(allPermissions);
+        setSelectedPermissions(
+          rolePermissions.map((permission) => permission.name),
+        );
+      } catch {
+        if (!cancelled) {
+          setPermissionsLoadError('Unable to load permissions. Please try again.');
+          setPermissions([]);
+          setSelectedPermissions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingPermissions(false);
+        }
+      }
+    };
+
+    const timer = window.setTimeout(() => {
+      void loadPermissions();
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [canManageRolePermissions, hasLoadedRole, id]);
 
   if (!canEditRole) {
     return (
@@ -265,6 +297,11 @@ export default function RoleEdit() {
         });
       }
 
+      showToast({
+        title: 'Role Updated',
+        message: 'The role has been updated successfully.',
+      });
+
       navigate(routes.roles.show(roleId));
     } catch (requestError: unknown) {
       const validationError = getApiFieldErrors(requestError).name?.[0];
@@ -312,6 +349,7 @@ export default function RoleEdit() {
           canEditName={canUpdateRoles}
           canManagePermissions={canManageRolePermissions}
           error={error}
+          permissionsError={permissionsLoadError}
           nameError={nameError}
           submitLabel="Update Role"
           submittingLabel="Updating..."

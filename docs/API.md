@@ -196,6 +196,7 @@ Authorization: Bearer <token>
 ```
 
 A `401 Unauthorized` response clears the stored access token.
+Non-auth failures while validating the session do not clear the token, so a temporary backend or network issue does not force a logout.
 
 ## Permissions
 

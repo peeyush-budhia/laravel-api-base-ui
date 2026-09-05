@@ -14,6 +14,7 @@ import { getApiFieldErrors } from '../../utils/apiErrorUtils';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
+import { useToast } from '../../components/common/useToast';
 import UserForm from '../../components/users/UserForm';
 
 interface FieldErrors {
@@ -27,6 +28,7 @@ interface FieldErrors {
 export default function UserEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { can } = useAuthorization();
 
@@ -166,6 +168,11 @@ export default function UserEdit() {
 
     try {
       await usersApi.update(id, payload);
+
+      showToast({
+        title: 'User Updated',
+        message: 'The user has been updated successfully.',
+      });
 
       navigate(routes.users.show(id));
     } catch (error: unknown) {

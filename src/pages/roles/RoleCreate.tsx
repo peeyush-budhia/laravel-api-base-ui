@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router';
 
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useToast } from '../../components/common/useToast';
 import RoleForm from '../../components/roles/RoleForm';
 
 import { rolesApi } from '../../api/roles';
@@ -20,6 +21,7 @@ import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function RoleCreate() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { can } = useAuthorization();
 
@@ -132,6 +134,11 @@ export default function RoleCreate() {
           permissions: selectedPermissions,
         });
       }
+
+      showToast({
+        title: 'Role Created',
+        message: 'The role has been created successfully.',
+      });
 
       navigate(routes.roles.show(role.id), {
         replace: true,

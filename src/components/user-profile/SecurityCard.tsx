@@ -11,6 +11,7 @@ import {
   getApiFieldErrors,
 } from '../../utils/apiErrorUtils';
 import { useModal } from '../../hooks/useModal';
+import { useToast } from '../common/useToast';
 
 import ErrorState from '../common/ErrorState';
 import LoadingState from '../common/LoadingState';
@@ -27,6 +28,7 @@ interface FieldErrors {
 
 export default function ProfileChangePasswordCard() {
   const { refreshUser } = useAuth();
+  const { showToast } = useToast();
   const { isOpen, openModal, closeModal } = useModal();
 
   const {
@@ -43,7 +45,6 @@ export default function ProfileChangePasswordCard() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generalError, setGeneralError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const passwordValidation = useMemo(() => {
     if (!policy) {
@@ -116,7 +117,6 @@ export default function ProfileChangePasswordCard() {
 
     setFieldErrors({});
     setGeneralError('');
-    setIsSuccess(false);
 
     openModal();
   }
@@ -134,7 +134,6 @@ export default function ProfileChangePasswordCard() {
 
     setFieldErrors({});
     setGeneralError('');
-    setIsSuccess(false);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -146,7 +145,6 @@ export default function ProfileChangePasswordCard() {
 
     setFieldErrors({});
     setGeneralError('');
-    setIsSuccess(false);
 
     const validationErrors = validate();
 
@@ -172,7 +170,11 @@ export default function ProfileChangePasswordCard() {
 
       setFieldErrors({});
       setGeneralError('');
-      setIsSuccess(true);
+      showToast({
+        title: 'Password Updated',
+        message: 'Your password has been changed successfully.',
+      });
+      closeModal();
     } catch (error: unknown) {
       const apiErrors = getApiFieldErrors(error);
       setFieldErrors(apiErrors as FieldErrors);
@@ -237,15 +239,6 @@ export default function ProfileChangePasswordCard() {
                 className="mb-5 rounded-lg border border-error-500/20 bg-error-500/5 px-4 py-3 text-sm text-error-500"
               >
                 {generalError}
-              </div>
-            )}
-
-            {isSuccess && (
-              <div
-                role="status"
-                className="mb-5 rounded-lg border border-success-500/20 bg-success-500/5 px-4 py-3 text-sm text-success-600 dark:text-success-400"
-              >
-                Your password has been changed successfully.
               </div>
             )}
 

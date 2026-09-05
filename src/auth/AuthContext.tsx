@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { AuthContext } from './context';
 import { authService } from './authService';
 import { tokenStorage } from './token';
+import { getApiError } from '../utils/apiErrorUtils';
 
 import type { AuthUser, LoginCredentials } from './types';
 
@@ -26,8 +27,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const currentUser = await authService.me();
 
       setUser(currentUser);
-    } catch {
-      tokenStorage.clear();
+    } catch (error: unknown) {
+      if (getApiError(error)?.status === 401) {
+        tokenStorage.clear();
+      }
+
       setUser(null);
     }
   }, []);

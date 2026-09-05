@@ -1,5 +1,6 @@
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import type { DashboardAuditLog } from '../../types/dashboard';
+import { getUserDisplayName } from '../../utils/userNameUtils';
 import Badge from '../ui/badge/Badge';
 import {
   Table,
@@ -87,7 +88,7 @@ export default function RecentAuditLogs({ logs }: RecentAuditLogsProps) {
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                         {log.user
-                          ? `${log.user.first_name} ${log.user.last_name}`.trim()
+                          ? getUserDisplayName(log.user, 'System')
                           : 'System'}
                       </p>
 

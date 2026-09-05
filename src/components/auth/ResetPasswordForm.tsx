@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { EyeCloseIcon, EyeIcon } from '../../icons';
 import { authService } from '../../auth/authService';
@@ -14,6 +14,7 @@ import {
 
 import ErrorState from '../common/ErrorState';
 import LoadingState from '../common/LoadingState';
+import { useToast } from '../common/useToast';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
 import Button from '../ui/button/Button';
@@ -26,7 +27,9 @@ interface ValidationErrors {
 }
 
 export default function ResetPasswordForm() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   const token = searchParams.get('token') ?? '';
   const email = searchParams.get('email') ?? '';
@@ -48,7 +51,6 @@ export default function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const passwordValidation = useMemo(() => {
     if (!policy) {
@@ -162,7 +164,13 @@ export default function ResetPasswordForm() {
         password_confirmation: passwordConfirmation,
       });
 
-      setIsSuccess(true);
+      showToast({
+        title: 'Password Updated',
+        message: 'Your password has been updated successfully.',
+        durationMs: 15000,
+      });
+
+      navigate(routes.auth.signIn, { replace: true });
     } catch (error: unknown) {
       const apiError = getApiFieldErrors(error);
 
@@ -202,43 +210,6 @@ export default function ResetPasswordForm() {
       setIsSubmitting(false);
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto" />
-
-        <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-          <div>
-            <div className="mb-5 sm:mb-8">
-              <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                Password Reset Successful
-              </h1>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Your password has been reset successfully. You can now sign in
-                with your new password.
-              </p>
-            </div>
-
-            <div
-              role="status"
-              className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400"
-            >
-              Your password has been updated successfully.
-            </div>
-
-            <Link
-              to={routes.auth.signIn}
-              className="block w-full text-center text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!token || !email) {
     return (

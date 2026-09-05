@@ -8,6 +8,7 @@ import type { Role } from '../../types/role';
 import type { UserStatus } from '../../types/user';
 
 import PageMeta from '../../components/common/PageMeta';
+import { useToast } from '../../components/common/useToast';
 import UserForm from '../../components/users/UserForm';
 
 import { routes } from '../../routes/routes';
@@ -27,6 +28,7 @@ interface FieldErrors {
 
 export default function UserCreate() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
@@ -93,6 +95,11 @@ export default function UserCreate() {
         email: email.trim(),
         role,
         status,
+      });
+
+      showToast({
+        title: 'User Created',
+        message: 'The user has been created successfully.',
       });
 
       navigate(routes.users.index);

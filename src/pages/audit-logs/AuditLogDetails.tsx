@@ -17,6 +17,7 @@ import UserAvatar from '../../components/users/UserAvatar';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import { auditEventLabels, auditEventColors } from '../../types/auditLog';
+import { getUserDisplayName } from '../../utils/userNameUtils';
 
 function getEventLabel(event: string): string {
   if (event in auditEventLabels) {
@@ -41,15 +42,7 @@ function getResourceName(type: string): string {
 }
 
 function getUserName(log: AuditLog): string {
-  if (!log.user) {
-    return 'System';
-  }
-
-  return (
-    `${log.user.first_name} ${log.user.last_name}`.trim() ||
-    log.user.email ||
-    'User'
-  );
+  return getUserDisplayName(log.user, 'System');
 }
 
 export default function AuditLogDetails() {

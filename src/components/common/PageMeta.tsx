@@ -1,6 +1,7 @@
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 
 import { env } from '../../config/env';
+import { ToastProvider } from './ToastContext';
 
 interface PageMetaProps {
   title: string;
@@ -15,7 +16,9 @@ const PageMeta = ({ title, description }: PageMetaProps) => (
 );
 
 export const AppWrapper = ({ children }: { children: React.ReactNode }) => (
-  <HelmetProvider>{children}</HelmetProvider>
+  <HelmetProvider>
+    <ToastProvider>{children}</ToastProvider>
+  </HelmetProvider>
 );
 
 export default PageMeta;

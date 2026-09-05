@@ -35,11 +35,41 @@
 
 ### v0.9.x — Frontend Feature Completeness
 
-- [ ] Complete remaining profile functionality
-- [x] Improve dashboard integration with real backend data
-- [ ] Review all permission-driven navigation and actions
-- [ ] Improve session/token lifecycle handling
-- [ ] Add consistent confirmation and notification patterns
+- 1. Auth
+  - [x] Finalize token lifecycle handling
+  - [x] Confirm `remember_me` persistence behavior
+  - [x] Handle token expiry and invalid-session recovery
+  - [x] Keep guest and authenticated root redirects stable
+
+- 2. Profile
+  - [x] Complete remaining profile functionality
+  - [x] Verify avatar upload and profile image handling
+  - [x] Add consistent success and error feedback
+  - [x] Review password and security-related profile actions
+
+- 3. Dashboard
+  - [x] Improve dashboard integration with real backend data
+  - [ ] Review dashboard widgets for loading, empty, and error states
+  - [ ] Keep recent activity formatting consistent
+  - [ ] Verify dashboard permission and fallback behavior
+
+- 4. Users
+  - [ ] Review permission-driven actions in user list, details, edit, and create flows
+  - [ ] Add confirmation for delete, restore, and force-delete actions
+  - [ ] Standardize notifications after user actions
+  - [ ] Check route guards and unauthorized states
+
+- 5. Roles & Permissions
+  - [ ] Review permission-driven actions in role list, details, edit, and create flows
+  - [ ] Add confirmation for role delete and permission sync actions
+  - [ ] Standardize notifications after role actions
+  - [ ] Validate empty and error states for permission data
+
+- 6. Audit Logs
+  - [ ] Verify list and detail display consistency
+  - [ ] Keep date and user formatting consistent
+  - [ ] Ensure pagination, filters, and empty states are handled cleanly
+  - [ ] Confirm permission-based access behavior
 
 ### v1.0.0 — Production Baseline
 

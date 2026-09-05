@@ -19,7 +19,7 @@ export const userStatusColors: Record<
 export type UserTrashedFilter = 'without' | 'with' | 'only';
 export const userTrashedFilterLabels: Record<UserTrashedFilter, string> = {
   without: 'Active Users',
-  with: 'All Users',
+  with: 'Active & Deleted Users',
   only: 'Deleted Users',
 };
 

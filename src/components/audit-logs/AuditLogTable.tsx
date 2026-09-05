@@ -21,6 +21,7 @@ import UserAvatar from '../users/UserAvatar';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import Button from '../ui/button/Button';
+import { getUserDisplayName } from '../../utils/userNameUtils';
 
 interface AuditLogTableProps {
   logs: AuditLog[];
@@ -146,7 +147,7 @@ export default function AuditLogTable({
 
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-                          {`${log.user.first_name} ${log.user.last_name}`.trim()}
+                          {getUserDisplayName(log.user)}
                         </p>
 
                         <p className="truncate text-sm text-gray-500 dark:text-gray-400">
