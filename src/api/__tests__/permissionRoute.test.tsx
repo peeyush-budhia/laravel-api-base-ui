@@ -33,7 +33,6 @@ function createUser(userPermissions: string[] = []): AuthUser {
     role: 'admin',
     permissions: userPermissions,
     status: 'active',
-    must_change_password: false,
     email_verified_at: null,
     last_login_at: null,
     created_at: null,
@@ -70,7 +69,10 @@ describe('PermissionRoute', () => {
             path={routes.auditLogs.index}
             element={<div>Audit Logs Page</div>}
           />
-          <Route path={routes.profile.index} element={<div>Profile Page</div>} />
+          <Route
+            path={routes.profile.index}
+            element={<div>Profile Page</div>}
+          />
 
           <Route
             path={routes.error.unauthorized}

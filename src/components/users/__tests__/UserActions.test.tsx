@@ -6,7 +6,11 @@ import { SUPER_ADMIN_ROLE } from '../../../constants/roles';
 import type { User } from '../../../types/user';
 
 vi.mock('../../common/ActionsDropdown', () => ({
-  default: ({ items }: { items: Array<{ label: string; variant?: string }> }) => (
+  default: ({
+    items,
+  }: {
+    items: Array<{ label: string; variant?: string }>;
+  }) => (
     <div data-testid="actions-dropdown">
       {items.map((item) => (
         <span key={item.label} data-variant={item.variant ?? 'default'}>
@@ -28,7 +32,6 @@ function createUser(overrides: Partial<User> = {}): User {
     role: 'Editor',
     status: 'active',
     permissions: [],
-    must_change_password: false,
     email_verified_at: null,
     last_login_at: null,
     created_at: null,

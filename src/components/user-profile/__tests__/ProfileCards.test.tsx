@@ -6,6 +6,7 @@ import UserMetaCard from '../UserMetaCard';
 import { profile } from '../../../api/profile';
 import { useAuth } from '../../../auth/useAuth';
 import type { AuthUser } from '../../../auth/types';
+import { usePasswordPolicy } from '../../../hooks/usePasswordPolicy';
 import { useToast } from '../../common/useToast';
 
 vi.mock('../../../api/profile', () => ({
@@ -17,6 +18,10 @@ vi.mock('../../../api/profile', () => ({
 
 vi.mock('../../../auth/useAuth', () => ({
   useAuth: vi.fn(),
+}));
+
+vi.mock('../../../hooks/usePasswordPolicy', () => ({
+  usePasswordPolicy: vi.fn(),
 }));
 
 vi.mock('../../common/useToast', () => ({
@@ -34,7 +39,6 @@ function createUser(): AuthUser {
     role: 'Administrator',
     permissions: [],
     status: 'active',
-    must_change_password: false,
     email_verified_at: null,
     last_login_at: null,
     created_at: null,
@@ -62,6 +66,18 @@ describe('Profile cards', () => {
     vi.mocked(useToast).mockReturnValue({
       showToast,
       hideToast: vi.fn(),
+    });
+
+    vi.mocked(usePasswordPolicy).mockReturnValue({
+      policy: {
+        min_length: 12,
+        require_mixed_case: true,
+        require_numbers: true,
+        require_symbols: true,
+      },
+      isLoading: false,
+      error: '',
+      reload: vi.fn(),
     });
   });
 

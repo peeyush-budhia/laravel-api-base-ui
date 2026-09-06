@@ -99,7 +99,8 @@ export default function UserCreate() {
 
       showToast({
         title: 'User Created',
-        message: 'The user has been created successfully.',
+        message:
+          'The user was created and will receive an account activation email.',
       });
 
       navigate(routes.users.index);
@@ -154,7 +155,7 @@ export default function UserCreate() {
             generalError={generalError}
             submitLabel="Save User"
             submittingLabel="Saving..."
-            passwordMessage="A secure password will be generated automatically and sent to the user's email address. The user will be required to change the password after the first login."
+            passwordMessage="The user will receive an expiring activation link by email to create their password. No temporary password will be sent."
             onFirstNameChange={setFirstName}
             onLastNameChange={setLastName}
             onEmailChange={setEmail}

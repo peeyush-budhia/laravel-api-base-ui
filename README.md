@@ -39,6 +39,7 @@ The backend project contains the authoritative API documentation and API standar
 
 - Authentication and logout
 - Forgot/reset/change password flows
+- Account activation for administrator-created users
 - Protected application routes
 - Permission-aware UI
 - User management

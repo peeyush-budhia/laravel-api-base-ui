@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BoxIconLine, FileIcon, GroupIcon } from '../../icons';
+import { ListIcon, GroupIcon, KeyIcon, ShieldIcon } from '../../icons';
 import type { DashboardSummary } from '../../types/dashboard';
 
 interface DashboardMetricsProps {
@@ -27,21 +27,21 @@ export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
       value: summary.roles.total,
       accentClassName:
         'bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400',
-      icon: <GroupIcon className="size-6" />,
+      icon: <ShieldIcon className="size-6" />,
     },
     {
       label: 'Permissions',
       value: summary.permissions.total,
       accentClassName:
         'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400',
-      icon: <FileIcon className="size-6" />,
+      icon: <KeyIcon className="size-6" />,
     },
     {
       label: 'Audit Logs',
       value: summary.audit_logs.total,
       accentClassName:
         'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400',
-      icon: <BoxIconLine className="size-6" />,
+      icon: <ListIcon className="size-6" />,
     },
   ];
 

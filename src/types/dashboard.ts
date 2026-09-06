@@ -9,7 +9,6 @@ export interface DashboardUser {
   status: DashboardUserStatus;
   email_verified_at: string | null;
   last_login_at: string | null;
-  must_change_password: boolean;
   created_at: string | null;
   updated_at: string | null;
   deleted_at: string | null;

@@ -33,7 +33,6 @@ export interface User {
   role: string | null;
   permissions: string[];
   status: UserStatus;
-  must_change_password: boolean;
   email_verified_at: string | null;
   last_login_at: string | null;
   created_at: string | null;

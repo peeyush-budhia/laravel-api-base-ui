@@ -71,7 +71,6 @@ const activeUser: User = {
   role: 'Editor',
   status: 'active',
   permissions: [],
-  must_change_password: false,
   email_verified_at: null,
   last_login_at: null,
   created_at: null,
@@ -201,7 +200,9 @@ describe('Users', () => {
       expect(usersApi.list).toHaveBeenCalled();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Trigger Force Delete' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Trigger Force Delete' }),
+    );
 
     expect(
       await screen.findByRole('button', { name: 'Permanently Delete' }),

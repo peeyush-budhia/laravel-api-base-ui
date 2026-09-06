@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { permissions } from '../../auth/permissions';
 import { useAuthorization } from '../../auth/useAuthorization';
@@ -16,7 +16,9 @@ import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useToast } from '../../components/common/useToast';
 import Badge from '../../components/ui/badge/Badge';
+import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
 
 function UserAvatar({ user }: { user: User }) {
   if (user.avatar) {
@@ -56,15 +58,21 @@ function DetailItem({
 
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const { can } = useAuthorization();
+  const { showToast } = useToast();
 
   const canViewUsers = can(permissions.users.view);
   const canUpdateUsers = can(permissions.users.update);
+  const canDeleteUsers = can(permissions.users.delete);
 
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const editableUser =
     canUpdateUsers && user && user.role !== SUPER_ADMIN_ROLE ? user : null;
@@ -108,6 +116,41 @@ export default function UserDetails() {
       window.clearTimeout(timer);
     };
   }, [id, canViewUsers, loadUser]);
+
+  function closeDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
+
+    setDeleteUser(null);
+    setDeleteError('');
+  }
+
+  async function handleDeleteUser() {
+    if (!deleteUser || isDeleting) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+
+    try {
+      await usersApi.delete(deleteUser.id);
+
+      setDeleteUser(null);
+      showToast({
+        title: 'User Deleted',
+        message: 'The user has been deleted successfully.',
+      });
+      navigate(routes.users.index);
+    } catch (error: unknown) {
+      setDeleteError(
+        getApiErrorMessage(error, 'Unable to delete user. Please try again.'),
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <>
@@ -185,14 +228,29 @@ export default function UserDetails() {
                   </div>
                 </div>
 
-                {editableUser && (
-                  <Link
-                    to={routes.users.edit(editableUser.id)}
-                    className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
-                  >
-                    Edit User
-                  </Link>
-                )}
+                {user.role !== SUPER_ADMIN_ROLE &&
+                  (editableUser || canDeleteUsers) && (
+                    <div className="flex flex-wrap items-center gap-3">
+                      {editableUser && (
+                        <Link
+                          to={routes.users.edit(editableUser.id)}
+                          className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+                        >
+                          Edit User
+                        </Link>
+                      )}
+
+                      {canDeleteUsers && (
+                        <button
+                          type="button"
+                          onClick={() => setDeleteUser(user)}
+                          className="inline-flex items-center justify-center rounded-lg bg-error-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-error-600"
+                        >
+                          Delete User
+                        </button>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -270,6 +328,15 @@ export default function UserDetails() {
           </>
         )}
       </div>
+
+      <UserActionConfirmationModal
+        user={deleteUser}
+        action="delete"
+        isSubmitting={isDeleting}
+        error={deleteError}
+        onClose={closeDeleteConfirmation}
+        onConfirm={() => void handleDeleteUser()}
+      />
     </>
   );
 }

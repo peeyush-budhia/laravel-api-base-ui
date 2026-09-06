@@ -6,6 +6,10 @@ Current work on the frontend expands the project beyond API integration into tes
 
 ### Auth and Profile
 
+- Added account activation for administrator-created users through expiring
+  onboarding links and the existing password-reset API contract.
+- Account activation now verifies the onboarding email when the user
+  successfully chooses their password.
 - Completed token lifecycle handling and root redirect stability.
 - Confirmed remember-me persistence behavior and invalid-session recovery.
 - Completed profile avatar, profile update, and password/security action cleanup.
@@ -40,6 +44,7 @@ Current work on the frontend expands the project beyond API integration into tes
 
 ### Testing
 
+- Kept dashboard and sidebar tests isolated from SVG icon implementations.
 - Added a Vitest test setup with jsdom and shared test setup.
 - Added API service tests for auth, users, roles, profile, dashboard, and audit logs.
 - Added route and authorization tests.
@@ -61,6 +66,9 @@ Current work on the frontend expands the project beyond API integration into tes
 
 ### Cleanup
 
+- Removed the obsolete standalone change-password route and
+  `must_change_password` API state; authenticated password changes remain in
+  the profile security section.
 - Removed unused settings and signup screens from the routed application.
 
 ## v0.7.0

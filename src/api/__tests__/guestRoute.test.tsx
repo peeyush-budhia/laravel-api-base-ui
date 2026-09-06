@@ -24,7 +24,6 @@ function createUser(overrides: Partial<AuthUser> = {}): AuthUser {
     role: 'admin',
     permissions: [],
     status: 'active',
-    must_change_password: false,
     email_verified_at: null,
     last_login_at: null,
     created_at: null,

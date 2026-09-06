@@ -6,7 +6,7 @@ import AppLayout from './layout/AppLayout';
 import SignIn from './pages/auth/SignIn';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
-import ChangePassword from './pages/auth/ChangePassword';
+import ActivateAccount from './pages/auth/ActivateAccount';
 
 import Home from './pages/dashboard/Home';
 import GuestNotFound from './pages/others/GuestNotFound';
@@ -54,16 +54,15 @@ export default function App() {
           />
 
           <Route path={routes.auth.resetPassword} element={<ResetPassword />} />
+
+          <Route
+            path={routes.auth.activateAccount}
+            element={<ActivateAccount />}
+          />
         </Route>
 
         {/* Authenticated Routes */}
         <Route element={<ProtectedRoute />}>
-          {/* Forced password change */}
-          <Route
-            path={routes.auth.changePassword}
-            element={<ChangePassword />}
-          />
-
           {/* Application */}
           <Route element={<AppLayout />}>
             <Route

@@ -7,11 +7,11 @@ import { permissions, type Permission } from '../auth/permissions';
 // Assume these icons are imported from an icon library
 import {
   ChevronDownIcon,
-  GridIcon,
-  BoxCubeIcon,
   MoreDotIcon,
-  UserCircleIcon,
   ListIcon,
+  ShieldIcon,
+  GridIcon,
+  GroupIcon,
 } from '../icons';
 import { useSidebar } from '../context/SidebarContext';
 
@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
 
 const administrationItems: NavItem[] = [
   {
-    icon: <UserCircleIcon />,
+    icon: <GroupIcon />,
     name: 'Users',
     path: routes.users.index,
     permissions: [
@@ -47,7 +47,7 @@ const administrationItems: NavItem[] = [
     ],
   },
   {
-    icon: <BoxCubeIcon />,
+    icon: <ShieldIcon />,
     name: 'Roles & Permissions',
     path: routes.roles.index,
     permissions: [
@@ -97,7 +97,9 @@ const AppSidebar: React.FC = () => {
 
   const isVisible = useCallback(
     (nav: NavItem) =>
-      !nav.permissions || nav.permissions.length === 0 || canAny(nav.permissions),
+      !nav.permissions ||
+      nav.permissions.length === 0 ||
+      canAny(nav.permissions),
     [canAny],
   );
 
@@ -196,7 +198,7 @@ const AppSidebar: React.FC = () => {
                 <span className="menu-item-text">{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
-                  <ChevronDownIcon
+                <ChevronDownIcon
                   className={`ml-auto w-5 h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.name === nav.name
@@ -210,9 +212,9 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 to={nav.path}
-              className={`menu-item group ${
-                isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
-              }`}
+                className={`menu-item group ${
+                  isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
+                }`}
               >
                 <span
                   className={`menu-item-icon-size ${
@@ -282,12 +284,12 @@ const AppSidebar: React.FC = () => {
                     </Link>
                   </li>
                 ))}
-          </ul>
-        </div>
-      )}
-    </li>
-  ))}
-  </ul>
+              </ul>
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 
   return (

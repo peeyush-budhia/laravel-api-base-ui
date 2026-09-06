@@ -85,6 +85,22 @@ Operations:
 - Change password
 - Get password policy
 
+Authenticated password changes are presented in the profile security section.
+
+### Account Activation
+
+Administrators create users without choosing or receiving a temporary
+password. The backend queues an onboarding email after the user transaction
+commits. Its expiring link opens the public `/activate-account` route with the
+user email and reset token in the query string.
+
+The activation page submits the email, token, password, and password
+confirmation through the existing `/auth/reset-password` endpoint. A successful
+activation sets `email_verified_at` on the backend because the emailed token
+proves access to the onboarding address. The user can then sign in with the new
+password. Expired or already-used links show the normalized backend error and
+direct the user to request help from an administrator.
+
 ### Dashboard
 
 ```text

@@ -14,7 +14,6 @@ const user = {
   status: 'active' as const,
   email_verified_at: null,
   last_login_at: null,
-  must_change_password: false,
   created_at: null,
   updated_at: null,
   deleted_at: null,
@@ -44,8 +43,6 @@ describe('Recent user cards', () => {
   it('shows an empty state when there are no recently active users', () => {
     render(<RecentlyActiveUsers users={[]} />);
 
-    expect(
-      screen.getByText('No recently active users'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('No recently active users')).toBeInTheDocument();
   });
 });

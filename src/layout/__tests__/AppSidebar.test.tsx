@@ -26,6 +26,8 @@ vi.mock('../../icons', () => {
     BoxCubeIcon: Icon,
     UserCircleIcon: Icon,
     ListIcon: Icon,
+    GroupIcon: Icon,
+    ShieldIcon: Icon,
   };
 });
 

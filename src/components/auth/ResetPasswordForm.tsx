@@ -26,13 +26,20 @@ interface ValidationErrors {
   password_confirmation?: string[];
 }
 
-export default function ResetPasswordForm() {
+interface ResetPasswordFormProps {
+  mode?: 'reset' | 'activation';
+}
+
+export default function ResetPasswordForm({
+  mode = 'reset',
+}: ResetPasswordFormProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
 
   const token = searchParams.get('token') ?? '';
   const email = searchParams.get('email') ?? '';
+  const isActivation = mode === 'activation';
 
   const {
     policy,
@@ -165,8 +172,10 @@ export default function ResetPasswordForm() {
       });
 
       showToast({
-        title: 'Password Updated',
-        message: 'Your password has been updated successfully.',
+        title: isActivation ? 'Account Activated' : 'Password Updated',
+        message: isActivation
+          ? 'Your password has been created. You can now sign in.'
+          : 'Your password has been updated successfully.',
         durationMs: 15000,
       });
 
@@ -192,7 +201,9 @@ export default function ResetPasswordForm() {
           setGeneralError(
             getApiErrorMessage(
               error,
-              'Unable to reset your password. Please try again.',
+              isActivation
+                ? 'Unable to activate your account. The link may have expired.'
+                : 'Unable to reset your password. Please try again.',
             ),
           );
         }
@@ -203,7 +214,9 @@ export default function ResetPasswordForm() {
       setGeneralError(
         getApiErrorMessage(
           error,
-          'Unable to reset your password. Please try again.',
+          isActivation
+            ? 'Unable to activate your account. The link may have expired.'
+            : 'Unable to reset your password. Please try again.',
         ),
       );
     } finally {
@@ -220,12 +233,15 @@ export default function ResetPasswordForm() {
           <div>
             <div className="mb-5 sm:mb-8">
               <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                Invalid Reset Link
+                {isActivation
+                  ? 'Invalid Activation Link'
+                  : 'Invalid Reset Link'}
               </h1>
 
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                This password reset link is invalid or incomplete. Please
-                request a new password reset link.
+                {isActivation
+                  ? 'This account activation link is invalid or incomplete. Request a new password link to continue.'
+                  : 'This password reset link is invalid or incomplete. Please request a new password reset link.'}
               </p>
             </div>
 
@@ -233,7 +249,7 @@ export default function ResetPasswordForm() {
               to={routes.auth.forgotPassword}
               className="block w-full text-center text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
             >
-              Request New Reset Link
+              Request New Password Link
             </Link>
           </div>
         </div>
@@ -249,11 +265,13 @@ export default function ResetPasswordForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Reset Password
+              {isActivation ? 'Activate Your Account' : 'Reset Password'}
             </h1>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your new password below.
+              {isActivation
+                ? 'Create a secure password to finish setting up your account.'
+                : 'Enter your new password below.'}
             </p>
           </div>
 
@@ -450,8 +468,10 @@ export default function ResetPasswordForm() {
                         className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
                         aria-hidden="true"
                       />
-                      Resetting...
+                      {isActivation ? 'Activating...' : 'Resetting...'}
                     </span>
+                  ) : isActivation ? (
+                    'Activate Account'
                   ) : (
                     'Reset Password'
                   )}
@@ -462,7 +482,7 @@ export default function ResetPasswordForm() {
 
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-              Remember your password?{' '}
+              {isActivation ? 'Already activated?' : 'Remember your password?'}{' '}
               <Link
                 to={routes.auth.signIn}
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400"

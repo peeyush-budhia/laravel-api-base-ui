@@ -25,7 +25,6 @@ export default function AuditLogUserDisplay({
             role: null,
             permissions: [],
             status: 'active',
-            must_change_password: false,
             email_verified_at: null,
             last_login_at: null,
             created_at: null,

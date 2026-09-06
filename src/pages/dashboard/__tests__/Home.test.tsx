@@ -18,6 +18,17 @@ vi.mock('../../../auth/useAuthorization', () => ({
   useAuthorization: vi.fn(),
 }));
 
+vi.mock('../../../icons', () => {
+  const Icon = () => <svg aria-hidden="true" />;
+
+  return {
+    GroupIcon: Icon,
+    KeyIcon: Icon,
+    ListIcon: Icon,
+    ShieldIcon: Icon,
+  };
+});
+
 const dashboard: DashboardData = {
   summary: {
     users: {
@@ -45,14 +56,13 @@ const dashboard: DashboardData = {
     recent: [
       {
         id: 'user-1',
-        first_name: '',
-        last_name: '',
+        first_name: 'Taylor',
+        last_name: 'Swift',
         email: 'taylor@example.com',
         avatar: null,
         status: 'active',
         email_verified_at: null,
         last_login_at: null,
-        must_change_password: false,
         created_at: null,
         updated_at: null,
         deleted_at: null,
@@ -166,9 +176,7 @@ describe('Home', () => {
     expect(
       await screen.findByText('Unable to load dashboard'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('Server error.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Server error.')).toBeInTheDocument();
   });
 
   it('renders the unauthorized screen without dashboard permission', async () => {
