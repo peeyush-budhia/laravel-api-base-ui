@@ -140,7 +140,12 @@ export default function App() {
 
             <Route
               element={
-                <PermissionRoute permission={permissions.roles.update} />
+                <PermissionRoute
+                  permission={[
+                    permissions.roles.update,
+                    permissions.roles.managePermissions,
+                  ]}
+                />
               }
             >
               <Route path={routes.roles.editPattern} element={<RoleEdit />} />

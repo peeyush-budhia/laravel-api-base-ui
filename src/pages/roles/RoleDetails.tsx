@@ -28,7 +28,8 @@ export default function RoleDetails() {
 
   const { can } = useAuthorization();
 
-  const canViewRoles = can(authPermissions.roles.view);
+  const canUpdateRoles = can(authPermissions.roles.update);
+  const canManageRolePermissions = can(authPermissions.roles.managePermissions);
 
   const [role, setRole] = useState<Role | null>(null);
   const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
@@ -76,25 +77,6 @@ export default function RoleDetails() {
       window.clearTimeout(timer);
     };
   }, [id, loadRole]);
-
-  if (!canViewRoles) {
-    return (
-      <>
-        <PageMeta
-          title="Role Details"
-          description="View role details and permissions"
-        />
-
-        <PageBreadcrumb pageTitle="Role Details" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-            You do not have permission to view roles.
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
@@ -152,14 +134,15 @@ export default function RoleDetails() {
                     </p>
                   </div>
 
-                  {role.name !== SUPER_ADMIN_ROLE && (
-                    <Link
-                      to={routes.roles.edit(role.id)}
-                      className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
-                    >
-                      Edit Role
-                    </Link>
-                  )}
+                  {role.name !== SUPER_ADMIN_ROLE &&
+                    (canUpdateRoles || canManageRolePermissions) && (
+                      <Link
+                        to={routes.roles.edit(role.id)}
+                        className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+                      >
+                        Edit Role
+                      </Link>
+                    )}
                 </div>
               </div>
 

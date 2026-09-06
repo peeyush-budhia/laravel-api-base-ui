@@ -66,6 +66,10 @@ describe('PermissionRoute', () => {
           </Route>
 
           <Route path={routes.users.index} element={<div>Users Page</div>} />
+          <Route
+            path={routes.auditLogs.index}
+            element={<div>Audit Logs Page</div>}
+          />
           <Route path={routes.profile.index} element={<div>Profile Page</div>} />
 
           <Route
@@ -99,6 +103,15 @@ describe('PermissionRoute', () => {
     renderPermissionRoute(permissions.dashboard.view, false, user);
 
     expect(await screen.findByText('Users Page')).toBeInTheDocument();
+    expect(screen.queryByText('Unauthorized Page')).not.toBeInTheDocument();
+  });
+
+  it('redirects audit log users to the audit log index when that is the only allowed route', async () => {
+    const user = createUser([permissions.auditLogs.view]);
+
+    renderPermissionRoute(permissions.dashboard.view, false, user);
+
+    expect(await screen.findByText('Audit Logs Page')).toBeInTheDocument();
     expect(screen.queryByText('Unauthorized Page')).not.toBeInTheDocument();
   });
 

@@ -24,6 +24,20 @@ Current work on the frontend expands the project beyond API integration into tes
 - Standardized success notifications after user actions.
 - Centralized route guard behavior to redirect denied users to an allowed route.
 
+### Roles & Permissions
+
+- Reviewed permission-driven actions across the role list, detail, create, and edit flows.
+- Added confirmation before deleting roles and syncing permissions.
+- Standardized success notifications after role actions.
+- Validated permission loading, empty, and error states for role permission management.
+
+### Audit Logs
+
+- Reviewed audit log list and detail display consistency.
+- Standardized audit log user and date formatting across list, dashboard, and detail views.
+- Improved pagination, filter, and empty-state handling for audit log screens.
+- Centralized permission-based access behavior for audit logs.
+
 ### Testing
 
 - Added a Vitest test setup with jsdom and shared test setup.

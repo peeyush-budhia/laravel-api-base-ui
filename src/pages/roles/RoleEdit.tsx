@@ -7,6 +7,7 @@ import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import { useToast } from '../../components/common/useToast';
 import RoleForm from '../../components/roles/RoleForm';
+import RolePermissionsConfirmationModal from '../../components/roles/RolePermissionsConfirmationModal';
 
 import { rolesApi } from '../../api/roles';
 
@@ -50,6 +51,10 @@ export default function RoleEdit() {
   const [error, setError] = useState('');
   const [permissionsLoadError, setPermissionsLoadError] = useState('');
   const [hasLoadedRole, setHasLoadedRole] = useState(false);
+  const [originalPermissions, setOriginalPermissions] = useState<string[]>([]);
+  const [isPermissionConfirmationOpen, setIsPermissionConfirmationOpen] =
+    useState(false);
+  const [pendingRoleName, setPendingRoleName] = useState('');
 
   const [nameError, setNameError] = useState('');
 
@@ -75,6 +80,7 @@ export default function RoleEdit() {
         }
 
         setName(role.name);
+        setPendingRoleName(role.name);
         setHasLoadedRole(true);
       } catch {
         if (cancelled) {
@@ -119,9 +125,12 @@ export default function RoleEdit() {
         }
 
         setPermissions(allPermissions);
-        setSelectedPermissions(
-          rolePermissions.map((permission) => permission.name),
+        const permissionNames = rolePermissions.map(
+          (permission) => permission.name,
         );
+
+        setSelectedPermissions(permissionNames);
+        setOriginalPermissions(permissionNames);
       } catch {
         if (!cancelled) {
           setPermissionsLoadError('Unable to load permissions. Please try again.');
@@ -144,22 +153,6 @@ export default function RoleEdit() {
       window.clearTimeout(timer);
     };
   }, [canManageRolePermissions, hasLoadedRole, id]);
-
-  if (!canEditRole) {
-    return (
-      <>
-        <PageMeta title="Edit Role" description="Edit role and permissions" />
-
-        <PageBreadcrumb pageTitle="Edit Role" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-            You do not have permission to edit roles or manage role permissions.
-          </div>
-        </div>
-      </>
-    );
-  }
 
   if (!id) {
     return (
@@ -276,6 +269,23 @@ export default function RoleEdit() {
 
     setNameError('');
     setError('');
+    setPermissionsLoadError('');
+
+    const permissionNamesChanged =
+      canManageRolePermissions &&
+      selectedPermissions.join('|') !== originalPermissions.join('|');
+
+    if (permissionNamesChanged) {
+      setPendingRoleName(canUpdateRoles ? trimmedName : name);
+      setIsPermissionConfirmationOpen(true);
+
+      return;
+    }
+
+    await updateRole(trimmedName, false);
+  }
+
+  async function updateRole(roleName: string, shouldSyncPermissions: boolean) {
     setIsSubmitting(true);
 
     try {
@@ -284,14 +294,14 @@ export default function RoleEdit() {
        */
       if (canUpdateRoles) {
         await rolesApi.update(roleId, {
-          name: trimmedName,
+          name: roleName,
         });
       }
 
       /*
        * Synchronize permissions only when authorized.
        */
-      if (canManageRolePermissions) {
+      if (canManageRolePermissions && shouldSyncPermissions) {
         await rolesApi.syncPermissions(roleId, {
           permissions: selectedPermissions,
         });
@@ -319,6 +329,12 @@ export default function RoleEdit() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function handleConfirmPermissionChanges() {
+    setIsPermissionConfirmationOpen(false);
+
+    void updateRole(pendingRoleName, true);
   }
 
   return (
@@ -359,6 +375,20 @@ export default function RoleEdit() {
           onCancel={() => navigate(routes.roles.show(id))}
         />
       </div>
+
+      <RolePermissionsConfirmationModal
+        isOpen={isPermissionConfirmationOpen}
+        roleName={pendingRoleName}
+        permissionCount={selectedPermissions.length}
+        isSubmitting={isSubmitting}
+        error={error}
+        onClose={() => {
+          if (!isSubmitting) {
+            setIsPermissionConfirmationOpen(false);
+          }
+        }}
+        onConfirm={handleConfirmPermissionChanges}
+      />
     </>
   );
 }

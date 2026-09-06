@@ -60,16 +60,16 @@
   - [x] Check route guards and unauthorized states
 
 - 5. Roles & Permissions
-  - [ ] Review permission-driven actions in role list, details, edit, and create flows
-  - [ ] Add confirmation for role delete and permission sync actions
-  - [ ] Standardize notifications after role actions
-  - [ ] Validate empty and error states for permission data
+  - [x] Review permission-driven actions in role list, details, edit, and create flows
+  - [x] Add confirmation for role delete and permission sync actions
+  - [x] Standardize notifications after role actions
+  - [x] Validate empty and error states for permission data
 
 - 6. Audit Logs
-  - [ ] Verify list and detail display consistency
-  - [ ] Keep date and user formatting consistent
-  - [ ] Ensure pagination, filters, and empty states are handled cleanly
-  - [ ] Confirm permission-based access behavior
+  - [x] Verify list and detail display consistency
+  - [x] Keep date and user formatting consistent
+  - [x] Ensure pagination, filters, and empty states are handled cleanly
+  - [x] Confirm permission-based access behavior
 
 ### v1.0.0 — Production Baseline
 

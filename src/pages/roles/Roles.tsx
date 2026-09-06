@@ -15,6 +15,7 @@ import { permissions } from '../../auth/permissions';
 
 import PageMeta from '../../components/common/PageMeta';
 import Pagination from '../../components/common/Pagination';
+import { useToast } from '../../components/common/useToast';
 
 import RoleFilters from '../../components/roles/RoleFilters';
 import RoleTable from '../../components/roles/RoleTable';
@@ -25,6 +26,7 @@ import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function Roles() {
   const { can } = useAuthorization();
+  const { showToast } = useToast();
 
   const canViewRoles = can(permissions.roles.view);
   const canCreateRoles = can(permissions.roles.create);
@@ -172,6 +174,11 @@ export default function Roles() {
       setDeleteRole(null);
 
       await loadRoles();
+
+      showToast({
+        title: 'Role Deleted',
+        message: 'The role has been deleted successfully.',
+      });
     } catch (error: unknown) {
       setDeleteError(
         getApiErrorMessage(error, 'Unable to delete role. Please try again.'),
@@ -179,30 +186,6 @@ export default function Roles() {
     } finally {
       setIsDeleting(false);
     }
-  }
-
-  /*
-   * Permission guard
-   */
-  if (!canViewRoles) {
-    return (
-      <>
-        <PageMeta
-          title="Roles & Permissions"
-          description="Manage application roles and permissions"
-        />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to view roles.
-          </p>
-        </div>
-      </>
-    );
   }
 
   return (

@@ -15,6 +15,7 @@ import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import Badge from '../../components/ui/badge/Badge';
 
 function UserAvatar({ user }: { user: User }) {
@@ -115,35 +116,16 @@ export default function UserDetails() {
         description="View user details"
       />
 
+      <PageBreadcrumb pageTitle={user ? user.full_name : 'User Details'} />
+
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-              User Details
-            </h1>
-
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              View application user information.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {editableUser && (
-              <Link
-                to={routes.users.edit(editableUser.id)}
-                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
-              >
-                Edit User
-              </Link>
-            )}
-
-            <Link
-              to={routes.users.index}
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
-            >
-              ← Back to Users
-            </Link>
-          </div>
+        <div>
+          <Link
+            to={routes.users.index}
+            className="text-sm font-medium text-brand-500 hover:text-brand-600"
+          >
+            ← Back to Users
+          </Link>
         </div>
 
         {isLoading && <LoadingState message="Loading user details..." />}
@@ -176,30 +158,41 @@ export default function UserDetails() {
         {!isLoading && !error && user && (
           <>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <UserAvatar user={user} />
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                  <UserAvatar user={user} />
 
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-                    {user.full_name}
-                  </h2>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+                      {user.full_name}
+                    </h2>
 
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {user.email}
-                  </p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {user.email}
+                    </p>
 
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Badge size="sm" color={userStatusColors[user.status]}>
-                      {userStatusLabels[user.status]}
-                    </Badge>
-
-                    {user.role && (
-                      <Badge size="sm" color="info">
-                        {user.role}
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Badge size="sm" color={userStatusColors[user.status]}>
+                        {userStatusLabels[user.status]}
                       </Badge>
-                    )}
+
+                      {user.role && (
+                        <Badge size="sm" color="info">
+                          {user.role}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {editableUser && (
+                  <Link
+                    to={routes.users.edit(editableUser.id)}
+                    className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+                  >
+                    Edit User
+                  </Link>
+                )}
               </div>
             </div>
 

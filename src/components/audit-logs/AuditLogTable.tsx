@@ -17,12 +17,11 @@ import {
   auditEventLabels,
 } from '../../types/auditLog';
 
-import UserAvatar from '../users/UserAvatar';
-
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import Button from '../ui/button/Button';
-import { getUserDisplayName } from '../../utils/userNameUtils';
-
+import { Link } from 'react-router';
+import { routes } from '../../routes/routes';
+import AuditLogUserDisplay from './AuditLogUserDisplay';
 interface AuditLogTableProps {
   logs: AuditLog[];
   isLoading: boolean;
@@ -116,54 +115,19 @@ export default function AuditLogTable({
             logs.map((log) => (
               <TableRow key={log.id}>
                 <TableCell className="px-5 py-4">
-                  <Badge size="sm" color={getEventColor(log.event)}>
-                    {getEventLabel(log.event)}
-                  </Badge>
+                  <Link
+                    to={routes.auditLogs.show(log.id)}
+                    className="inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+                    aria-label={`View details for ${getEventLabel(log.event)} audit log`}
+                  >
+                    <Badge size="sm" color={getEventColor(log.event)}>
+                      {getEventLabel(log.event)}
+                    </Badge>
+                  </Link>
                 </TableCell>
 
                 <TableCell className="px-5 py-4">
-                  {log.user ? (
-                    <div className="flex items-center gap-3">
-                      <UserAvatar
-                        user={{
-                          id: log.user.id,
-                          first_name: log.user.first_name,
-                          last_name: log.user.last_name,
-                          full_name:
-                            `${log.user.first_name} ${log.user.last_name}`.trim(),
-                          email: log.user.email,
-                          avatar: log.user.avatar,
-                          role: null,
-                          permissions: [],
-                          status: 'active',
-                          must_change_password: false,
-                          email_verified_at: null,
-                          last_login_at: null,
-                          created_at: null,
-                          updated_at: null,
-                          deleted_at: null,
-                        }}
-                      />
-
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-                          {getUserDisplayName(log.user)}
-                        </p>
-
-                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                          {log.user.email}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-                          System
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  <AuditLogUserDisplay user={log.user} />
                 </TableCell>
 
                 <TableCell className="px-5 py-4">
@@ -187,7 +151,7 @@ export default function AuditLogTable({
                     size="sm"
                     type="button"
                     onClick={() => onView(log.id)}
-                    className="text-sm font-medium text-brand-50 hover:text-brand-100 dark:text-brand-50 dark:hover:text-brand-100"
+                    className="px-3 py-2 text-xs font-medium leading-none text-brand-50 hover:text-brand-100 dark:text-brand-50 dark:hover:text-brand-100"
                   >
                     View
                   </Button>
