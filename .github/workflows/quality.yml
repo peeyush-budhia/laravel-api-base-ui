@@ -40,6 +40,9 @@ jobs:
       - name: Create Local Vite Configuration
         run: cp vite.config.example.ts vite.config.ts
 
+      - name: Create Test Environment
+        run: cp .env.example .env
+
       - name: Check Formatting
         run: npm run format:check
 
