@@ -2,7 +2,7 @@
 
 ## Current
 
-### v0.8.0 — Frontend Quality & UX
+### v0.9.0 — Frontend Feature Completeness (Released 2026-09-07)
 
 - [x] Add a frontend automated test setup
 - [x] Add API service tests
@@ -18,6 +18,8 @@
 
 ## Recently Released
 
+### v0.8.0 — Frontend Quality & UX
+
 ### v0.7.x — API Documentation & Integration
 
 - [x] Centralized API endpoint definitions
@@ -31,9 +33,9 @@
 - [x] Link frontend documentation to backend API documentation
 - [x] Link frontend project to backend repository
 
-## Next
+## Release history and next work
 
-### v0.9.x — Frontend Feature Completeness
+### v0.9.x — Frontend Feature Completeness (released as v0.9.0)
 
 - 1. Auth
   - [x] Finalize token lifecycle handling

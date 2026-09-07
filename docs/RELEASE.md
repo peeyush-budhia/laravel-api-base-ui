@@ -1,5 +1,15 @@
 # Release Notes
 
+## v0.9.0 — 2026-09-07
+
+The v0.9.0 release completes frontend feature parity with the backend API,
+including account activation, profile and security flows, permission-aware user
+and role management, dashboard and audit integrations, and the frontend quality
+workflow.
+
+See the backend [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+for the complete backend and frontend setup.
+
 ## v0.8.0
 
 Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
