@@ -7,7 +7,11 @@ import {
 } from 'react';
 
 import Toast from './Toast';
-import { ToastContext, type ToastOptions, type ToastState } from './toastContext';
+import {
+  ToastContext,
+  type ToastOptions,
+  type ToastState,
+} from './toastContext';
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);

@@ -36,11 +36,7 @@ vi.mock('../../../components/common/Pagination', () => ({
 }));
 
 vi.mock('../../../components/roles/RoleTable', () => ({
-  default: ({
-    onDelete,
-  }: {
-    onDelete: (role: Role) => void;
-  }) => (
+  default: ({ onDelete }: { onDelete: (role: Role) => void }) => (
     <div>
       <button type="button" onClick={() => onDelete(role)}>
         Trigger Delete

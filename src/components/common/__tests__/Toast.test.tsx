@@ -62,9 +62,13 @@ describe('ToastProvider', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Show' }));
 
-    expect(screen.getByRole('status')).toHaveTextContent('User created successfully.');
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'User created successfully.',
+    );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss notification' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Dismiss notification' }),
+    );
 
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
 

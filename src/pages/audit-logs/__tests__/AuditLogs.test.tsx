@@ -108,9 +108,7 @@ describe('AuditLogs', () => {
 
     renderAuditLogs();
 
-    expect(
-      await screen.findByText('No audit logs found'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('No audit logs found')).toBeInTheDocument();
   });
 
   it('renders an error state when loading fails', async () => {

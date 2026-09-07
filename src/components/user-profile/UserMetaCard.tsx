@@ -181,7 +181,6 @@ export default function UserMetaCard() {
             {avatarError && (
               <p className="mt-2 text-sm text-error-500">{avatarError}</p>
             )}
-
           </div>
         </div>
       </div>

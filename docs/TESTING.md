@@ -40,3 +40,17 @@ Typical patterns in this codebase:
 
 When changing routes, permissions, validation, or API behavior, update the affected tests in the same change set.
 
+## Continuous Integration
+
+The GitHub Actions workflow in `.github/workflows/quality.yml` runs on pushes
+to `main`, `develop`, and feature branches, and on pull requests targeting
+`main` or `develop`. It installs the locked dependencies and requires all of
+the following checks to pass:
+
+- `npm run format:check`
+- `npm run lint`
+- `npm test`
+- `npm run build`
+
+Run the same commands locally before opening a pull request. Formatting and
+lint failures are reported before the test and production-build steps.

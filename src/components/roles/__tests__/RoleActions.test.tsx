@@ -6,7 +6,11 @@ import { SUPER_ADMIN_ROLE } from '../../../constants/roles';
 import type { Role } from '../../../types/role';
 
 vi.mock('../../common/ActionsDropdown', () => ({
-  default: ({ items }: { items: Array<{ label: string; variant?: string }> }) => (
+  default: ({
+    items,
+  }: {
+    items: Array<{ label: string; variant?: string }>;
+  }) => (
     <div data-testid="actions-dropdown">
       {items.map((item) => (
         <span key={item.label} data-variant={item.variant ?? 'default'}>

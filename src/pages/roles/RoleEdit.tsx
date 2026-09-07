@@ -133,7 +133,9 @@ export default function RoleEdit() {
         setOriginalPermissions(permissionNames);
       } catch {
         if (!cancelled) {
-          setPermissionsLoadError('Unable to load permissions. Please try again.');
+          setPermissionsLoadError(
+            'Unable to load permissions. Please try again.',
+          );
           setPermissions([]);
           setSelectedPermissions([]);
         }

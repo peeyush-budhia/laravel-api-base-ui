@@ -1,9 +1,6 @@
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import type { DashboardAuditLog } from '../../types/dashboard';
-import {
-  getDisplayName,
-  getResourceName,
-} from '../../utils/dashboardUtils';
+import { getDisplayName, getResourceName } from '../../utils/dashboardUtils';
 import Badge from '../ui/badge/Badge';
 import {
   Table,
