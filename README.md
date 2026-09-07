@@ -73,6 +73,8 @@ The backend sends an expiring activation link after a new user is committed. The
 - [Frontend API Integration](docs/API.md)
 - [Production deployment](docs/PRODUCTION.md)
 - [Security and error handling](docs/SECURITY.md)
+- [Accessibility review](docs/ACCESSIBILITY.md)
+- [Performance review](docs/PERFORMANCE.md)
 - [Release Guide](docs/RELEASE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Backend setup guide](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
