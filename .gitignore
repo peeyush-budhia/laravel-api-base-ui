@@ -25,5 +25,7 @@ dist-ssr
 .agents
 .codex
 
-# Local configuration
+# Local app configuration
 .env.local
+# Local Vite configuration
+vite.config.ts

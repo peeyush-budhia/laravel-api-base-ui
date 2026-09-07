@@ -16,6 +16,16 @@ This repository contains the frontend for the Laravel API Base backend.
 npm install
 ```
 
+Create the local Vite configuration from the tracked example before running
+the development server or production build:
+
+```bash
+cp vite.config.example.ts vite.config.ts
+```
+
+`vite.config.ts` is local-only and is excluded from Git. Update
+`vite.config.example.ts` when shared Vite defaults change.
+
 2. Create a local environment file if needed.
 
 ```bash

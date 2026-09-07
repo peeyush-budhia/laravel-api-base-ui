@@ -1,183 +1,80 @@
 # Laravel API Base UI
 
-React + Vite frontend for the **Laravel API Base** backend.
+Laravel API Base UI is the React and TypeScript frontend for the [Laravel API Base](https://github.com/peeyush-budhia/laravel-api-base) backend. It provides browser flows for authentication, account activation, profiles, users, roles, permissions, audit logs, and dashboard statistics.
 
-This project provides the web UI for authentication, user management, role management, permissions, profile management, and dashboard functionality.
-
-## Related Project
-
-Backend repository:
-
-- [Laravel API Base](https://github.com/peeyush-budhia/laravel-api-base)
-
-The frontend communicates with the versioned Laravel API provided by the backend project.
-
-## Documentation
-
-### Frontend Documentation
-
-Frontend documentation is maintained in this repository under `docs/`.
-
-- Current release: `v0.8.0`
-- [API Integration](docs/API.md)
-- [Development Guide](docs/DEVELOPMENT.md)
-- [Testing Guide](docs/TESTING.md)
-- [Release Notes](docs/RELEASE.md)
-- [Roadmap](docs/ROADMAP.md)
-
-### Backend API Documentation
-
-The backend project contains the authoritative API documentation and API standards.
-
-- [Backend Repository](https://github.com/peeyush-budhia/laravel-api-base)
-- [Backend API Documentation](https://github.com/peeyush-budhia/laravel-api-base/tree/main/docs)
-- [Backend API Standards](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/API_STANDARDS.md)
-
-> The backend API documentation is the source of truth for API endpoints, request/response contracts, authentication, validation, and API behavior. Frontend documentation describes how this UI consumes those APIs.
-
-## Features
-
-- Authentication and logout
-- Forgot/reset/change password flows
-- Account activation for administrator-created users
-- Protected application routes
-- Permission-aware UI
-- User management
-- Role management
-- Role permission management
-- User profile management
-- Avatar upload
-- Pagination, filtering, searching, and sorting
-- Centralized Axios API client
-- Centralized API endpoint definitions
-- TypeScript API contracts
-- Responsive dashboard UI
-
-## Tech Stack
-
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Axios
-- React Router
-- ApexCharts
+Current development line: **v0.9.0**.
 
 ## Requirements
 
-- Node.js
-- npm
-- Running Laravel API Base backend
+- Node.js 22+
+- npm 10+
+- A running Laravel API Base backend
 
-## Configuration
-
-Create the local environment file:
+## Quick start
 
 ```bash
+git clone https://github.com/peeyush-budhia/laravel-api-base-ui.git
+cd laravel-api-base-ui
+npm ci
 cp .env.example .env
-```
-
-Configure the backend API base URL in the frontend environment.
-
-The frontend expects the API base URL to point to the Laravel API Base versioned API.
-
-## Installation
-
-```bash
-npm install
-```
-
-## Development
-
-```bash
+cp vite.config.example.ts vite.config.ts
 npm run dev
 ```
 
-## Validation
+The UI runs at `http://localhost:5173`. The example environment points to `http://localhost:8000/api/v1`; change `VITE_API_BASE_URL` when the backend uses another host or port. `vite.config.ts` is local-only and ignored by Git.
 
-Run linting:
+For the complete two-project setup, see the backend repository's [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md).
 
-```bash
-npm run lint
-```
+## Features
 
-Run the production build:
+- Sanctum login, logout, token expiry recovery, and password reset
+- Administrator-created account activation
+- Permission-aware route guards and actions
+- User, role, and permission management
+- Profile and avatar management
+- Dashboard statistics and recent activity
+- Audit-log filtering, sorting, pagination, and empty states
+- Centralized Axios client and typed API contracts
 
-```bash
-npm run build
-```
-
-Run formatting checks:
-
-```bash
-npm run format:check
-```
-
-## API Architecture
-
-The frontend keeps API concerns centralized:
+## Project structure
 
 ```text
-src/
-├── api/
-│   ├── client.ts
-│   ├── endpoints.ts
-│   ├── roles.ts
-│   ├── users.ts
-│   └── profile.ts
-├── auth/
-│   ├── authService.ts
-│   ├── authorization.ts
-│   ├── permissions.ts
-│   ├── token.ts
-│   └── types.ts
-└── types/
+src/api          API client, endpoints, and feature operations
+src/auth         token, session, permissions, and authorization helpers
+src/components   reusable and feature-specific UI components
+src/pages        route-level screens
+src/types        shared TypeScript contracts
+src/test         Vitest and Testing Library setup
+docs             development, API, testing, release, and roadmap guidance
 ```
 
-`src/api/endpoints.ts` contains the frontend endpoint map.
+The backend API is the source of truth for routes, payloads, permissions, and validation. Update the frontend API modules and types when those contracts change.
 
-`src/api/client.ts` contains the shared Axios client, authentication header handling, FormData handling, and normalized API error handling.
-
-`src/api/profile.ts`, `src/api/users.ts`, and `src/api/roles.ts` contain feature-specific API operations.
-
-## Backend / Frontend Relationship
-
-```text
-Laravel API Base
-       │
-       │ REST API /api/v1
-       ▼
-laravel-api-base-ui
-       │
-       ├── Authentication
-       ├── Profile
-       ├── Users
-       ├── Roles
-       └── Permissions
-```
-
-Keep backend and frontend contracts synchronized when API endpoints, request payloads, response structures, permissions, or validation rules change.
-
-## Versioning
-
-The backend uses API versioning. Frontend releases should identify the backend API version they support.
-
-For the current project release, refer to the backend repository for the authoritative API release and documentation.
-
-## Contributing
-
-Use feature branches and keep changes focused.
-
-Before opening a pull request, run:
+## Commands
 
 ```bash
-npm run lint
-npm run build
-npm run format:check
+npm run dev            # start Vite development server
+npm run build          # type-check and create the production bundle
+npm run lint           # run ESLint
+npm run format:check   # verify Prettier formatting
+npm test               # run the Vitest suite
 ```
 
-Update relevant documentation when changing API integration, routes, permissions, or user-facing behavior.
+GitHub Actions runs formatting, linting, all tests, and the production build.
 
-## License
+## Account activation
 
-See the repository for licensing information.
+The backend sends an expiring activation link after a new user is committed. The UI serves `/activate-account`, reads the `email` and `token` query parameters, and submits the chosen password to the backend reset-password endpoint. Run a backend queue worker while testing this flow.
+
+## Documentation
+
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Testing Guide](docs/TESTING.md)
+- [Frontend API Integration](docs/API.md)
+- [Release Guide](docs/RELEASE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Backend setup guide](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+
+## Contributing and license
+
+Use feature branches, keep backend contracts synchronized, and update tests and documentation with user-facing changes. See the repository license for terms.

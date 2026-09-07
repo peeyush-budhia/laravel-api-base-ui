@@ -4,7 +4,9 @@ This project uses Vitest with React Testing Library and jsdom.
 
 ## Setup
 
-The test runner is configured in `vitest.config.ts`.
+The test runner is configured in `vitest.config.ts`. The Vite build
+configuration is copied from `vite.config.example.ts` to the ignored local
+`vite.config.ts` during setup and CI.
 
 Global test setup lives in `src/test/setup.ts`.
 

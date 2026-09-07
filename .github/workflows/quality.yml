@@ -37,6 +37,9 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Create Local Vite Configuration
+        run: cp vite.config.example.ts vite.config.ts
+
       - name: Check Formatting
         run: npm run format:check
 
