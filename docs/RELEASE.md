@@ -7,7 +7,7 @@ including account activation, profile and security flows, permission-aware user
 and role management, dashboard and audit integrations, and the frontend quality
 workflow.
 
-See the backend [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+See the backend [docs/SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
 for the complete backend and frontend setup.
 
 ## v0.8.0

@@ -23,7 +23,7 @@ npm run dev
 
 The UI runs at `http://localhost:5173`. The example environment points to `http://localhost:8000/api/v1`; change `VITE_API_BASE_URL` when the backend uses another host or port. `vite.config.ts` is local-only and ignored by Git.
 
-For the complete two-project setup, see the backend repository's [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md).
+For the complete two-project setup, see the backend repository's [docs/SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md).
 
 ## Features
 
@@ -73,7 +73,8 @@ The backend sends an expiring activation link after a new user is committed. The
 - [Frontend API Integration](docs/API.md)
 - [Release Guide](docs/RELEASE.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Backend setup guide](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+- [Backend setup guide](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
+- [v1.0.0 API contract freeze](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/API_CONTRACT_FREEZE.md)
 
 ## Contributing and license
 

@@ -2,6 +2,8 @@
 
 This document describes how `laravel-api-base-ui` consumes the Laravel API Base backend.
 
+The v1.0.0 compatibility boundary is recorded in [API_CONTRACT_FREEZE.md](API_CONTRACT_FREEZE.md).
+
 ## Backend
 
 - [Laravel API Base repository](https://github.com/peeyush-budhia/laravel-api-base)
