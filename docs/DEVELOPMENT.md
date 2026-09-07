@@ -16,6 +16,16 @@ This repository contains the frontend for the Laravel API Base backend.
 npm install
 ```
 
+Create the local Vite configuration from the tracked example before running
+the development server or production build:
+
+```bash
+cp vite.config.example.ts vite.config.ts
+```
+
+`vite.config.ts` is local-only and is excluded from Git. Update
+`vite.config.example.ts` when shared Vite defaults change.
+
 2. Create a local environment file if needed.
 
 ```bash
@@ -51,3 +61,17 @@ When backend routes, payloads, permissions, or validation rules change:
 3. Update the UI and route guards if required.
 4. Update the API documentation in `docs/API.md`.
 5. Update the roadmap or release notes if the change affects delivery status.
+
+## Testing Account Onboarding
+
+Run the backend queue worker before creating a user so the activation email is
+delivered:
+
+```bash
+php artisan queue:work
+```
+
+Open the activation link from the email. The frontend route is
+`/activate-account`; it reads the `email` and `token` query parameters and sends
+the chosen password to the backend reset-password endpoint. Keep the frontend
+application URL configured in the backend so generated links point to this UI.

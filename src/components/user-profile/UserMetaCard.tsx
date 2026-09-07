@@ -8,9 +8,11 @@ import {
 } from '../../utils/apiErrorUtils';
 import { userStatusColors, userStatusLabels } from '../../types/user';
 import Badge from '../ui/badge/Badge';
+import { useToast } from '../common/useToast';
 
 export default function UserMetaCard() {
   const { user, refreshUser } = useAuth();
+  const { showToast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,11 +52,13 @@ export default function UserMetaCard() {
 
     if (!allowedTypes.includes(file.type)) {
       setAvatarError('Please select a JPG, PNG, or WebP image.');
+      event.target.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       setAvatarError('Avatar must not exceed 5 MB.');
+      event.target.value = '';
       return;
     }
 
@@ -63,12 +67,18 @@ export default function UserMetaCard() {
     try {
       await profile.updateAvatar(file);
       await refreshUser();
+      showToast({
+        title: 'Avatar Updated',
+        message: 'Profile picture updated successfully.',
+      });
+      event.target.value = '';
     } catch (error: unknown) {
       const errors = getApiFieldErrors(error);
       setAvatarError(
         errors.avatar?.[0] ??
           getApiErrorMessage(error, 'Unable to update your avatar.'),
       );
+      event.target.value = '';
     } finally {
       setIsUploading(false);
     }

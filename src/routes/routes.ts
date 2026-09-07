@@ -3,7 +3,7 @@ export const routes = {
     signIn: '/signin',
     forgotPassword: '/forgot-password',
     resetPassword: '/reset-password',
-    changePassword: '/change-password',
+    activateAccount: '/activate-account',
   },
 
   dashboard: {

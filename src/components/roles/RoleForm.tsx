@@ -3,6 +3,7 @@ import type React from 'react';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
+import ErrorState from '../common/ErrorState';
 
 import PermissionGroups from '../permissions/PermissionGroups';
 
@@ -24,6 +25,8 @@ interface RoleFormProps {
   canManagePermissions: boolean;
 
   error: string;
+
+  permissionsError?: string;
 
   nameError?: string;
 
@@ -49,6 +52,7 @@ export default function RoleForm({
   canEditName,
   canManagePermissions,
   error,
+  permissionsError,
   nameError,
   submitLabel,
   submittingLabel,
@@ -114,6 +118,12 @@ export default function RoleForm({
             <div className="rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-sm text-warning-600 dark:border-warning-500/30 dark:bg-warning-500/10 dark:text-warning-400">
               You do not have permission to manage role permissions.
             </div>
+          ) : permissionsError ? (
+            <ErrorState
+              title="Unable to load permissions"
+              message={permissionsError}
+              className="min-h-0 px-0 py-0"
+            />
           ) : isLoadingPermissions ? (
             <div className="space-y-4">
               {Array.from({ length: 2 }).map((_, index) => (

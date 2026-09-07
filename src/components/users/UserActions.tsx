@@ -9,6 +9,7 @@ interface UserActionsProps {
   canView: boolean;
   canUpdate: boolean;
   canDelete: boolean;
+  canRestore: boolean;
   onDelete: (user: User) => void;
   onRestore: (user: User) => void;
   onForceDelete: (user: User) => void;
@@ -19,6 +20,7 @@ export default function UserActions({
   canView,
   canUpdate,
   canDelete,
+  canRestore,
   onDelete,
   onRestore,
   onForceDelete,
@@ -58,12 +60,17 @@ export default function UserActions({
         ]
       : []),
 
-    ...(canDelete && user.deleted_at
+    ...(canRestore && user.deleted_at
       ? [
           {
             label: 'Restore',
             onClick: () => onRestore(user),
           },
+        ]
+      : []),
+
+    ...(canDelete && user.deleted_at
+      ? [
           {
             label: 'Permanently Delete',
             onClick: () => onForceDelete(user),

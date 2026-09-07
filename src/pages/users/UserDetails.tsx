@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { permissions } from '../../auth/permissions';
 import { useAuthorization } from '../../auth/useAuthorization';
@@ -15,7 +15,10 @@ import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useToast } from '../../components/common/useToast';
 import Badge from '../../components/ui/badge/Badge';
+import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
 
 function UserAvatar({ user }: { user: User }) {
   if (user.avatar) {
@@ -55,15 +58,21 @@ function DetailItem({
 
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const { can } = useAuthorization();
+  const { showToast } = useToast();
 
   const canViewUsers = can(permissions.users.view);
   const canUpdateUsers = can(permissions.users.update);
+  const canDeleteUsers = can(permissions.users.delete);
 
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const editableUser =
     canUpdateUsers && user && user.role !== SUPER_ADMIN_ROLE ? user : null;
@@ -108,29 +117,39 @@ export default function UserDetails() {
     };
   }, [id, canViewUsers, loadUser]);
 
-  if (!canViewUsers) {
-    return (
-      <>
-        <PageMeta title="User Details" description="View user details" />
+  function closeDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
+    setDeleteUser(null);
+    setDeleteError('');
+  }
 
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to view user details.
-          </p>
+  async function handleDeleteUser() {
+    if (!deleteUser || isDeleting) {
+      return;
+    }
 
-          <Link
-            to={routes.users.index}
-            className="mt-4 inline-flex rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white"
-          >
-            Back to Users
-          </Link>
-        </div>
-      </>
-    );
+    setIsDeleting(true);
+    setDeleteError('');
+
+    try {
+      await usersApi.delete(deleteUser.id);
+
+      setDeleteUser(null);
+      showToast({
+        title: 'User Deleted',
+        message: 'The user has been deleted successfully.',
+      });
+      navigate(routes.users.index);
+    } catch (error: unknown) {
+      setDeleteError(
+        getApiErrorMessage(error, 'Unable to delete user. Please try again.'),
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -140,35 +159,16 @@ export default function UserDetails() {
         description="View user details"
       />
 
+      <PageBreadcrumb pageTitle={user ? user.full_name : 'User Details'} />
+
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
-              User Details
-            </h1>
-
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              View application user information.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {editableUser && (
-              <Link
-                to={routes.users.edit(editableUser.id)}
-                className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
-              >
-                Edit User
-              </Link>
-            )}
-
-            <Link
-              to={routes.users.index}
-              className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
-            >
-              ← Back to Users
-            </Link>
-          </div>
+        <div>
+          <Link
+            to={routes.users.index}
+            className="text-sm font-medium text-brand-500 hover:text-brand-600"
+          >
+            ← Back to Users
+          </Link>
         </div>
 
         {isLoading && <LoadingState message="Loading user details..." />}
@@ -201,30 +201,56 @@ export default function UserDetails() {
         {!isLoading && !error && user && (
           <>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <UserAvatar user={user} />
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                  <UserAvatar user={user} />
 
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-                    {user.full_name}
-                  </h2>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+                      {user.full_name}
+                    </h2>
 
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {user.email}
-                  </p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {user.email}
+                    </p>
 
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Badge size="sm" color={userStatusColors[user.status]}>
-                      {userStatusLabels[user.status]}
-                    </Badge>
-
-                    {user.role && (
-                      <Badge size="sm" color="info">
-                        {user.role}
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Badge size="sm" color={userStatusColors[user.status]}>
+                        {userStatusLabels[user.status]}
                       </Badge>
-                    )}
+
+                      {user.role && (
+                        <Badge size="sm" color="info">
+                          {user.role}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {user.role !== SUPER_ADMIN_ROLE &&
+                  (editableUser || canDeleteUsers) && (
+                    <div className="flex flex-wrap items-center gap-3">
+                      {editableUser && (
+                        <Link
+                          to={routes.users.edit(editableUser.id)}
+                          className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+                        >
+                          Edit User
+                        </Link>
+                      )}
+
+                      {canDeleteUsers && (
+                        <button
+                          type="button"
+                          onClick={() => setDeleteUser(user)}
+                          className="inline-flex items-center justify-center rounded-lg bg-error-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-error-600"
+                        >
+                          Delete User
+                        </button>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -302,6 +328,15 @@ export default function UserDetails() {
           </>
         )}
       </div>
+
+      <UserActionConfirmationModal
+        user={deleteUser}
+        action="delete"
+        isSubmitting={isDeleting}
+        error={deleteError}
+        onClose={closeDeleteConfirmation}
+        onConfirm={() => void handleDeleteUser()}
+      />
     </>
   );
 }

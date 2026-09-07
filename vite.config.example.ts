@@ -6,9 +6,9 @@ import svgr from 'vite-plugin-svgr';
 export default defineConfig({
   server: {
     host: '0.0.0.0',
-    port: 80,
+    port: 5173,
     strictPort: true,
-    allowedHosts: ['ui-base.test', 'api-base-ui.test'],
+    allowedHosts: ['localhost'],
   },
 
   plugins: [

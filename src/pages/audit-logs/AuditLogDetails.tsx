@@ -13,10 +13,10 @@ import { routes } from '../../routes/routes';
 
 import PageMeta from '../../components/common/PageMeta';
 import Badge from '../../components/ui/badge/Badge';
-import UserAvatar from '../../components/users/UserAvatar';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import { auditEventLabels, auditEventColors } from '../../types/auditLog';
+import AuditLogUserDisplay from '../../components/audit-logs/AuditLogUserDisplay';
 
 function getEventLabel(event: string): string {
   if (event in auditEventLabels) {
@@ -38,18 +38,6 @@ function getEventColor(
 
 function getResourceName(type: string): string {
   return type.split('\\').pop() ?? type;
-}
-
-function getUserName(log: AuditLog): string {
-  if (!log.user) {
-    return 'System';
-  }
-
-  return (
-    `${log.user.first_name} ${log.user.last_name}`.trim() ||
-    log.user.email ||
-    'User'
-  );
 }
 
 export default function AuditLogDetails() {
@@ -117,6 +105,7 @@ export default function AuditLogDetails() {
         <PageMeta title="Audit Log" description="View audit log details." />
 
         <ErrorState
+          title="Unable to load audit log"
           message={error || 'Audit log not found.'}
           onRetry={() => void loadAuditLog()}
         />
@@ -156,56 +145,7 @@ export default function AuditLogDetails() {
 
             {/* User */}
             <DetailItem label="User">
-              {log.user ? (
-                <div className="flex items-center gap-3">
-                  <UserAvatar
-                    user={{
-                      id: log.user.id,
-                      first_name: log.user.first_name,
-                      last_name: log.user.last_name,
-                      full_name:
-                        `${log.user.first_name} ${log.user.last_name}`.trim(),
-                      email: log.user.email,
-                      avatar: log.user.avatar,
-                      role: null,
-                      permissions: [],
-                      status: 'active',
-                      must_change_password: false,
-                      email_verified_at: null,
-                      last_login_at: null,
-                      created_at: null,
-                      updated_at: null,
-                      deleted_at: null,
-                    }}
-                  />
-
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-gray-800 dark:text-white/90">
-                      {getUserName(log)}
-                    </p>
-
-                    <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                      {log.user.email}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                    S
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                      System
-                    </p>
-
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      System action
-                    </p>
-                  </div>
-                </div>
-              )}
+              <AuditLogUserDisplay user={log.user} />
             </DetailItem>
 
             {/* Resource */}

@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { EyeCloseIcon, EyeIcon } from '../../icons';
 import { authService } from '../../auth/authService';
@@ -14,6 +14,7 @@ import {
 
 import ErrorState from '../common/ErrorState';
 import LoadingState from '../common/LoadingState';
+import { useToast } from '../common/useToast';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
 import Button from '../ui/button/Button';
@@ -25,11 +26,20 @@ interface ValidationErrors {
   password_confirmation?: string[];
 }
 
-export default function ResetPasswordForm() {
+interface ResetPasswordFormProps {
+  mode?: 'reset' | 'activation';
+}
+
+export default function ResetPasswordForm({
+  mode = 'reset',
+}: ResetPasswordFormProps) {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   const token = searchParams.get('token') ?? '';
   const email = searchParams.get('email') ?? '';
+  const isActivation = mode === 'activation';
 
   const {
     policy,
@@ -48,7 +58,6 @@ export default function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const passwordValidation = useMemo(() => {
     if (!policy) {
@@ -162,7 +171,15 @@ export default function ResetPasswordForm() {
         password_confirmation: passwordConfirmation,
       });
 
-      setIsSuccess(true);
+      showToast({
+        title: isActivation ? 'Account Activated' : 'Password Updated',
+        message: isActivation
+          ? 'Your password has been created. You can now sign in.'
+          : 'Your password has been updated successfully.',
+        durationMs: 15000,
+      });
+
+      navigate(routes.auth.signIn, { replace: true });
     } catch (error: unknown) {
       const apiError = getApiFieldErrors(error);
 
@@ -184,7 +201,9 @@ export default function ResetPasswordForm() {
           setGeneralError(
             getApiErrorMessage(
               error,
-              'Unable to reset your password. Please try again.',
+              isActivation
+                ? 'Unable to activate your account. The link may have expired.'
+                : 'Unable to reset your password. Please try again.',
             ),
           );
         }
@@ -195,50 +214,15 @@ export default function ResetPasswordForm() {
       setGeneralError(
         getApiErrorMessage(
           error,
-          'Unable to reset your password. Please try again.',
+          isActivation
+            ? 'Unable to activate your account. The link may have expired.'
+            : 'Unable to reset your password. Please try again.',
         ),
       );
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="flex flex-col flex-1">
-        <div className="w-full max-w-md pt-10 mx-auto" />
-
-        <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-          <div>
-            <div className="mb-5 sm:mb-8">
-              <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                Password Reset Successful
-              </h1>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Your password has been reset successfully. You can now sign in
-                with your new password.
-              </p>
-            </div>
-
-            <div
-              role="status"
-              className="mb-5 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-sm text-success-600 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400"
-            >
-              Your password has been updated successfully.
-            </div>
-
-            <Link
-              to={routes.auth.signIn}
-              className="block w-full text-center text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!token || !email) {
     return (
@@ -249,12 +233,15 @@ export default function ResetPasswordForm() {
           <div>
             <div className="mb-5 sm:mb-8">
               <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                Invalid Reset Link
+                {isActivation
+                  ? 'Invalid Activation Link'
+                  : 'Invalid Reset Link'}
               </h1>
 
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                This password reset link is invalid or incomplete. Please
-                request a new password reset link.
+                {isActivation
+                  ? 'This account activation link is invalid or incomplete. Request a new password link to continue.'
+                  : 'This password reset link is invalid or incomplete. Please request a new password reset link.'}
               </p>
             </div>
 
@@ -262,7 +249,7 @@ export default function ResetPasswordForm() {
               to={routes.auth.forgotPassword}
               className="block w-full text-center text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
             >
-              Request New Reset Link
+              Request New Password Link
             </Link>
           </div>
         </div>
@@ -278,11 +265,13 @@ export default function ResetPasswordForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Reset Password
+              {isActivation ? 'Activate Your Account' : 'Reset Password'}
             </h1>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your new password below.
+              {isActivation
+                ? 'Create a secure password to finish setting up your account.'
+                : 'Enter your new password below.'}
             </p>
           </div>
 
@@ -479,8 +468,10 @@ export default function ResetPasswordForm() {
                         className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
                         aria-hidden="true"
                       />
-                      Resetting...
+                      {isActivation ? 'Activating...' : 'Resetting...'}
                     </span>
+                  ) : isActivation ? (
+                    'Activate Account'
                   ) : (
                     'Reset Password'
                   )}
@@ -491,7 +482,7 @@ export default function ResetPasswordForm() {
 
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-              Remember your password?{' '}
+              {isActivation ? 'Already activated?' : 'Remember your password?'}{' '}
               <Link
                 to={routes.auth.signIn}
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400"

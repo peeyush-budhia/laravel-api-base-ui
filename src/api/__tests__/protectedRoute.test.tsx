@@ -23,7 +23,6 @@ function createUser(overrides: Partial<AuthUser> = {}): AuthUser {
     role: 'admin',
     permissions: [],
     status: 'active',
-    must_change_password: false,
     email_verified_at: null,
     last_login_at: null,
     created_at: null,
@@ -60,11 +59,6 @@ function renderProtectedRoute(
             path={routes.auditLogs.index}
             element={<div>Audit Logs Page</div>}
           />
-
-          <Route
-            path={routes.auth.changePassword}
-            element={<div>Change Password Page</div>}
-          />
         </Route>
 
         <Route path={routes.auth.signIn} element={<div>Sign In Page</div>} />
@@ -100,85 +94,5 @@ describe('ProtectedRoute', () => {
     renderProtectedRoute(routes.dashboard.home, user);
 
     expect(screen.getByText('Dashboard Page')).toBeInTheDocument();
-  });
-
-  it('redirects users who must change their password', () => {
-    const user = createUser({
-      must_change_password: true,
-    });
-
-    renderProtectedRoute(routes.dashboard.home, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-
-    expect(screen.queryByText('Dashboard Page')).not.toBeInTheDocument();
-  });
-
-  it('redirects users who must change their password away from users', () => {
-    const user = createUser({
-      must_change_password: true,
-    });
-
-    renderProtectedRoute(routes.users.index, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-
-    expect(screen.queryByText('Users Page')).not.toBeInTheDocument();
-  });
-
-  it('redirects users who must change their password away from roles', () => {
-    const user = createUser({
-      must_change_password: true,
-    });
-
-    renderProtectedRoute(routes.roles.index, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-
-    expect(screen.queryByText('Roles Page')).not.toBeInTheDocument();
-  });
-
-  it('redirects users who must change their password away from audit logs', () => {
-    const user = createUser({
-      must_change_password: true,
-    });
-
-    renderProtectedRoute(routes.auditLogs.index, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-
-    expect(screen.queryByText('Audit Logs Page')).not.toBeInTheDocument();
-  });
-
-  it('allows users who must change their password to access change-password', () => {
-    const user = createUser({
-      must_change_password: true,
-    });
-
-    renderProtectedRoute(routes.auth.changePassword, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-  });
-
-  it('allows normal users to access change-password', () => {
-    const user = createUser({
-      must_change_password: false,
-    });
-
-    renderProtectedRoute(routes.auth.changePassword, user);
-
-    expect(screen.getByText('Change Password Page')).toBeInTheDocument();
-  });
-
-  it('allows access after must_change_password becomes false', () => {
-    const user = createUser({
-      must_change_password: false,
-    });
-
-    renderProtectedRoute(routes.dashboard.home, user);
-
-    expect(screen.getByText('Dashboard Page')).toBeInTheDocument();
-
-    expect(screen.queryByText('Change Password Page')).not.toBeInTheDocument();
   });
 });

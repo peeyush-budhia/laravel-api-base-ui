@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BoxIconLine, FileIcon, GroupIcon } from '../../icons';
+import { ListIcon, GroupIcon, KeyIcon, ShieldIcon } from '../../icons';
 import type { DashboardSummary } from '../../types/dashboard';
 
 interface DashboardMetricsProps {
@@ -10,6 +10,7 @@ interface Metric {
   label: string;
   value: number;
   icon: ReactNode;
+  accentClassName: string;
 }
 
 export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
@@ -17,22 +18,30 @@ export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
     {
       label: 'Total Users',
       value: summary.users.total,
-      icon: <GroupIcon className="size-6 text-gray-800 dark:text-white/90" />,
+      accentClassName:
+        'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400',
+      icon: <GroupIcon className="size-6" />,
     },
     {
       label: 'Roles',
       value: summary.roles.total,
-      icon: <GroupIcon className="size-6 text-gray-800 dark:text-white/90" />,
+      accentClassName:
+        'bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400',
+      icon: <ShieldIcon className="size-6" />,
     },
     {
       label: 'Permissions',
       value: summary.permissions.total,
-      icon: <FileIcon className="size-6 text-gray-800 dark:text-white/90" />,
+      accentClassName:
+        'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400',
+      icon: <KeyIcon className="size-6" />,
     },
     {
       label: 'Audit Logs',
       value: summary.audit_logs.total,
-      icon: <BoxIconLine className="size-6 text-gray-800 dark:text-white/90" />,
+      accentClassName:
+        'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400',
+      icon: <ListIcon className="size-6" />,
     },
   ];
 
@@ -43,7 +52,9 @@ export default function DashboardMetrics({ summary }: DashboardMetricsProps) {
           key={metric.label}
           className="h-full rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-xl ${metric.accentClassName}`}
+          >
             {metric.icon}
           </div>
 

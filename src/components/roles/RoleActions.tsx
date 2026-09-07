@@ -18,9 +18,11 @@ export default function RoleActions({
   canView,
   canUpdate,
   canDelete,
+  canManagePermissions,
   onDelete,
 }: RoleActionsProps) {
   const isSuperAdmin = role.name === SUPER_ADMIN_ROLE;
+  const canEditRole = canUpdate || canManagePermissions;
 
   const items: ActionItem[] = [
     ...(canView
@@ -32,7 +34,7 @@ export default function RoleActions({
         ]
       : []),
 
-    ...(canUpdate && !isSuperAdmin
+    ...(canEditRole && !isSuperAdmin
       ? [
           {
             label: 'Edit',

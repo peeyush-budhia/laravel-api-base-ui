@@ -6,6 +6,7 @@ import {
   getApiErrorMessage,
   getApiFieldErrors,
 } from '../../utils/apiErrorUtils';
+import { useToast } from '../common/useToast';
 
 import { useModal } from '../../hooks/useModal';
 import { Modal } from '../ui/modal';
@@ -22,6 +23,7 @@ interface FieldErrors {
 
 export default function UserInfoCard() {
   const { user, refreshUser } = useAuth();
+  const { showToast } = useToast();
   const { isOpen, openModal, closeModal } = useModal();
 
   function handleEdit() {
@@ -74,6 +76,11 @@ export default function UserInfoCard() {
       });
 
       await refreshUser();
+
+      showToast({
+        title: 'Profile Updated',
+        message: 'Profile information updated successfully.',
+      });
 
       closeModal();
     } catch (error: unknown) {
@@ -190,11 +197,12 @@ export default function UserInfoCard() {
 
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
-                <Label>
+                <Label htmlFor="profile-first-name">
                   First Name <span className="text-error-500">*</span>
                 </Label>
 
                 <Input
+                  id="profile-first-name"
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
                   disabled={isSubmitting}
@@ -204,11 +212,12 @@ export default function UserInfoCard() {
               </div>
 
               <div>
-                <Label>
+                <Label htmlFor="profile-last-name">
                   Last Name <span className="text-error-500">*</span>
                 </Label>
 
                 <Input
+                  id="profile-last-name"
                   value={lastName}
                   onChange={(event) => setLastName(event.target.value)}
                   disabled={isSubmitting}
@@ -218,11 +227,12 @@ export default function UserInfoCard() {
               </div>
 
               <div className="lg:col-span-2">
-                <Label>
+                <Label htmlFor="profile-email">
                   Email Address <span className="text-error-500">*</span>
                 </Label>
 
                 <Input
+                  id="profile-email"
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}

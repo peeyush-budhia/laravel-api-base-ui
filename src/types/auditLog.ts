@@ -31,6 +31,7 @@ export const auditEventColors: Record<
 
 export interface AuditLogUser {
   id: string;
+  full_name?: string | null;
   first_name: string;
   last_name: string;
   email: string;
