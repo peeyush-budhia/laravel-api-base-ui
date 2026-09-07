@@ -4,6 +4,9 @@ This document describes how `laravel-api-base-ui` consumes the Laravel API Base 
 
 The v1.0.0 compatibility boundary is recorded in [API_CONTRACT_FREEZE.md](API_CONTRACT_FREEZE.md).
 
+Production hosting and the backend origin required for browser requests are
+covered in [PRODUCTION.md](PRODUCTION.md).
+
 ## Backend
 
 - [Laravel API Base repository](https://github.com/peeyush-budhia/laravel-api-base)
