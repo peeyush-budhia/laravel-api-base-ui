@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router';
 
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
+import { useToast } from '../../components/common/useToast';
 import RoleForm from '../../components/roles/RoleForm';
+import RolePermissionsConfirmationModal from '../../components/roles/RolePermissionsConfirmationModal';
 
 import { rolesApi } from '../../api/roles';
 
@@ -20,6 +22,7 @@ import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function RoleCreate() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { can } = useAuthorization();
 
@@ -38,8 +41,12 @@ export default function RoleCreate() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [error, setError] = useState('');
+  const [permissionsError, setPermissionsError] = useState('');
 
   const [nameError, setNameError] = useState('');
+  const [pendingRoleName, setPendingRoleName] = useState('');
+  const [isPermissionConfirmationOpen, setIsPermissionConfirmationOpen] =
+    useState(false);
 
   useEffect(() => {
     if (!canCreateRoles || !canManageRolePermissions) {
@@ -51,6 +58,7 @@ export default function RoleCreate() {
     const fetchPermissions = async () => {
       setIsLoadingPermissions(true);
       setError('');
+      setPermissionsError('');
 
       try {
         const data = await rolesApi.allPermissions();
@@ -66,8 +74,7 @@ export default function RoleCreate() {
         }
 
         setPermissions([]);
-
-        setError('Unable to load permissions. Please try again.');
+        setPermissionsError('Unable to load permissions. Please try again.');
       } finally {
         if (!cancelled) {
           setIsLoadingPermissions(false);
@@ -103,6 +110,7 @@ export default function RoleCreate() {
 
     setError('');
     setNameError('');
+    setPermissionsError('');
 
     const trimmedName = name.trim();
 
@@ -112,10 +120,17 @@ export default function RoleCreate() {
       return;
     }
 
-    void createRole(trimmedName);
+    if (canManageRolePermissions && selectedPermissions.length > 0) {
+      setPendingRoleName(trimmedName);
+      setIsPermissionConfirmationOpen(true);
+
+      return;
+    }
+
+    void createRole(trimmedName, false);
   }
 
-  async function createRole(roleName: string) {
+  async function createRole(roleName: string, shouldSyncPermissions: boolean) {
     setIsSubmitting(true);
 
     try {
@@ -127,11 +142,16 @@ export default function RoleCreate() {
        * Only synchronize permissions when the
        * current user has permission to do so.
        */
-      if (canManageRolePermissions) {
+      if (canManageRolePermissions && shouldSyncPermissions) {
         await rolesApi.syncPermissions(role.id, {
           permissions: selectedPermissions,
         });
       }
+
+      showToast({
+        title: 'Role Created',
+        message: 'The role has been created successfully.',
+      });
 
       navigate(routes.roles.show(role.id), {
         replace: true,
@@ -156,27 +176,14 @@ export default function RoleCreate() {
     }
   }
 
-  function handleCancel() {
-    navigate(routes.roles.index);
+  function handleConfirmPermissionChanges() {
+    setIsPermissionConfirmationOpen(false);
+
+    void createRole(pendingRoleName, true);
   }
 
-  if (!canCreateRoles) {
-    return (
-      <>
-        <PageMeta
-          title="Create Role"
-          description="Create a new application role"
-        />
-
-        <PageBreadcrumb pageTitle="Create Role" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-            You do not have permission to create roles.
-          </div>
-        </div>
-      </>
-    );
+  function handleCancel() {
+    navigate(routes.roles.index);
   }
 
   return (
@@ -207,6 +214,7 @@ export default function RoleCreate() {
           canEditName={true}
           canManagePermissions={canManageRolePermissions}
           error={error}
+          permissionsError={permissionsError}
           nameError={nameError}
           submitLabel="Save Role"
           submittingLabel="Saving..."
@@ -216,6 +224,20 @@ export default function RoleCreate() {
           onCancel={handleCancel}
         />
       </div>
+
+      <RolePermissionsConfirmationModal
+        isOpen={isPermissionConfirmationOpen}
+        roleName={pendingRoleName}
+        permissionCount={selectedPermissions.length}
+        isSubmitting={isSubmitting}
+        error={error}
+        onClose={() => {
+          if (!isSubmitting) {
+            setIsPermissionConfirmationOpen(false);
+          }
+        }}
+        onConfirm={handleConfirmPermissionChanges}
+      />
     </>
   );
 }

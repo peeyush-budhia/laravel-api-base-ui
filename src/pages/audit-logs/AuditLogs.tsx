@@ -19,14 +19,8 @@ import type { AuditLog } from '../../types/auditLog';
 import type { PaginationMeta } from '../../types/pagination';
 
 import { routes } from '../../routes/routes';
-import { permissions } from '../../auth/permissions';
-import { useAuthorization } from '../../auth/useAuthorization';
 
 export default function AuditLogs() {
-  const { can } = useAuthorization();
-
-  const canViewAuditLogs = can(permissions.auditLogs.view);
-
   const navigate = useNavigate();
 
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -153,26 +147,6 @@ export default function AuditLogs() {
   function handleView(id: string) {
     navigate(routes.auditLogs.show(id));
   }
-  if (!canViewAuditLogs) {
-    return (
-      <>
-        <PageMeta
-          title="Audit Logs"
-          description="Review system activity and user actions."
-        />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to view Audit Logs.
-          </p>
-        </div>
-      </>
-    );
-  }
   return (
     <>
       <PageMeta
@@ -214,7 +188,11 @@ export default function AuditLogs() {
           {isLoading && <LoadingState message="Loading audit logs..." />}
           {/* General Error */}
           {error && (
-            <ErrorState message={error} onRetry={() => void loadAuditLogs()} />
+            <ErrorState
+              title="Unable to load audit logs"
+              message={error}
+              onRetry={() => void loadAuditLogs()}
+            />
           )}
 
           {/* Table */}

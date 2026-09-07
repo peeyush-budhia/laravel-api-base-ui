@@ -14,6 +14,7 @@ import { getApiFieldErrors } from '../../utils/apiErrorUtils';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
 import PageMeta from '../../components/common/PageMeta';
+import { useToast } from '../../components/common/useToast';
 import UserForm from '../../components/users/UserForm';
 
 interface FieldErrors {
@@ -27,6 +28,7 @@ interface FieldErrors {
 export default function UserEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const { can } = useAuthorization();
 
@@ -167,6 +169,11 @@ export default function UserEdit() {
     try {
       await usersApi.update(id, payload);
 
+      showToast({
+        title: 'User Updated',
+        message: 'The user has been updated successfully.',
+      });
+
       navigate(routes.users.show(id));
     } catch (error: unknown) {
       setFieldErrors(getApiFieldErrors(error) as FieldErrors);
@@ -176,31 +183,6 @@ export default function UserEdit() {
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  if (!canUpdateUsers) {
-    return (
-      <>
-        <PageMeta title="Edit User" description="Edit application user" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to update users.
-          </p>
-
-          <Link
-            to={routes.users.index}
-            className="mt-4 inline-flex text-sm font-medium text-brand-500 hover:text-brand-600"
-          >
-            ← Back to Users
-          </Link>
-        </div>
-      </>
-    );
   }
 
   if (isLoading) {

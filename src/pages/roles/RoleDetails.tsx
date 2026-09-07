@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import PageMeta from '../../components/common/PageMeta';
 import PageBreadcrumb from '../../components/common/PageBreadCrumb';
 import PermissionGroups from '../../components/permissions/PermissionGroups';
 import Badge from '../../components/ui/badge/Badge';
+import RoleActionConfirmationModal from '../../components/roles/RoleActionConfirmationModal';
 
 import LoadingState from '../../components/common/LoadingState';
 import ErrorState from '../../components/common/ErrorState';
@@ -22,19 +23,27 @@ import { permissions as authPermissions } from '../../auth/permissions';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import { useAuthorization } from '../../auth/useAuthorization';
+import { useToast } from '../../components/common/useToast';
 
 export default function RoleDetails() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const { can } = useAuthorization();
+  const { showToast } = useToast();
 
-  const canViewRoles = can(authPermissions.roles.view);
+  const canUpdateRoles = can(authPermissions.roles.update);
+  const canDeleteRoles = can(authPermissions.roles.delete);
+  const canManageRolePermissions = can(authPermissions.roles.managePermissions);
 
   const [role, setRole] = useState<Role | null>(null);
   const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteRole, setDeleteRole] = useState<Role | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const loadRole = useCallback(async () => {
     if (!id) {
@@ -77,23 +86,39 @@ export default function RoleDetails() {
     };
   }, [id, loadRole]);
 
-  if (!canViewRoles) {
-    return (
-      <>
-        <PageMeta
-          title="Role Details"
-          description="View role details and permissions"
-        />
+  function closeDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
 
-        <PageBreadcrumb pageTitle="Role Details" />
+    setDeleteRole(null);
+    setDeleteError('');
+  }
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
-            You do not have permission to view roles.
-          </div>
-        </div>
-      </>
-    );
+  async function handleDeleteRole() {
+    if (!deleteRole || isDeleting) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+
+    try {
+      await rolesApi.remove(deleteRole.id);
+
+      setDeleteRole(null);
+      showToast({
+        title: 'Role Deleted',
+        message: 'The role has been deleted successfully.',
+      });
+      navigate(routes.roles.index);
+    } catch (error: unknown) {
+      setDeleteError(
+        getApiErrorMessage(error, 'Unable to delete role. Please try again.'),
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -152,14 +177,31 @@ export default function RoleDetails() {
                     </p>
                   </div>
 
-                  {role.name !== SUPER_ADMIN_ROLE && (
-                    <Link
-                      to={routes.roles.edit(role.id)}
-                      className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
-                    >
-                      Edit Role
-                    </Link>
-                  )}
+                  {role.name !== SUPER_ADMIN_ROLE &&
+                    (canUpdateRoles ||
+                      canManageRolePermissions ||
+                      canDeleteRoles) && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        {(canUpdateRoles || canManageRolePermissions) && (
+                          <Link
+                            to={routes.roles.edit(role.id)}
+                            className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+                          >
+                            Edit Role
+                          </Link>
+                        )}
+
+                        {canDeleteRoles && (
+                          <button
+                            type="button"
+                            onClick={() => setDeleteRole(role)}
+                            className="inline-flex items-center justify-center rounded-lg bg-error-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-error-600"
+                          >
+                            Delete Role
+                          </button>
+                        )}
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -242,6 +284,14 @@ export default function RoleDetails() {
           </>
         )}
       </div>
+
+      <RoleActionConfirmationModal
+        role={deleteRole}
+        isSubmitting={isDeleting}
+        error={deleteError}
+        onClose={closeDeleteConfirmation}
+        onConfirm={() => void handleDeleteRole()}
+      />
     </>
   );
 }

@@ -37,6 +37,7 @@ interface UserTableProps {
   canView: boolean;
   canUpdate: boolean;
   canDelete: boolean;
+  canRestore: boolean;
 
   onSort: (field: string) => void;
 
@@ -54,6 +55,7 @@ export default function UserTable({
   canView,
   canUpdate,
   canDelete,
+  canRestore,
   onSort,
   onDelete,
   onRestore,
@@ -173,6 +175,7 @@ export default function UserTable({
                     canView={canView}
                     canUpdate={canUpdate}
                     canDelete={canDelete}
+                    canRestore={canRestore}
                     onDelete={onDelete}
                     onRestore={onRestore}
                     onForceDelete={onForceDelete}

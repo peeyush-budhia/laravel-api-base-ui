@@ -5,6 +5,10 @@ export function formatDateTime(value: string | null): string {
 
   const date = new Date(value);
 
+  if (Number.isNaN(date.getTime())) {
+    return 'Never';
+  }
+
   const datePart = new Intl.DateTimeFormat('en-IN', {
     day: '2-digit',
     month: '2-digit',
@@ -25,6 +29,10 @@ export function formatDate(value: string | null): string {
   }
 
   const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Never';
+  }
 
   const datePart = new Intl.DateTimeFormat('en-IN', {
     day: '2-digit',

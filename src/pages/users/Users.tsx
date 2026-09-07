@@ -13,17 +13,20 @@ import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
 import PageMeta from '../../components/common/PageMeta';
 import Pagination from '../../components/common/Pagination';
+import { useToast } from '../../components/common/useToast';
 import UserActionConfirmationModal from '../../components/users/UserActionConfirmationModal';
 import UserFilters from '../../components/users/UserFilters';
 import UserTable from '../../components/users/UserTable';
 
 export default function Users() {
   const { can } = useAuthorization();
+  const { showToast } = useToast();
 
   const canViewUsers = can(permissions.users.view);
   const canCreateUsers = can(permissions.users.create);
   const canUpdateUsers = can(permissions.users.update);
   const canDeleteUsers = can(permissions.users.delete);
+  const canRestoreUsers = can(permissions.users.restore);
 
   const [users, setUsers] = useState<User[]>([]);
 
@@ -174,6 +177,11 @@ export default function Users() {
       setDeleteUser(null);
 
       await loadUsers();
+
+      showToast({
+        title: 'User Deleted',
+        message: 'The user has been deleted successfully.',
+      });
     } catch (error: unknown) {
       setDeleteError(
         getApiErrorMessage(error, 'Unable to delete user. Please try again.'),
@@ -215,6 +223,11 @@ export default function Users() {
       setRestoreUser(null);
 
       await loadUsers();
+
+      showToast({
+        title: 'User Restored',
+        message: 'The user has been restored successfully.',
+      });
     } catch (error: unknown) {
       setRestoreError(
         getApiErrorMessage(error, 'Unable to restore user. Please try again.'),
@@ -256,6 +269,11 @@ export default function Users() {
       setForceDeleteUser(null);
 
       await loadUsers();
+
+      showToast({
+        title: 'User Permanently Deleted',
+        message: 'The user has been permanently deleted successfully.',
+      });
     } catch (error: unknown) {
       setForceDeleteError(
         getApiErrorMessage(
@@ -266,24 +284,6 @@ export default function Users() {
     } finally {
       setIsForceDeleting(false);
     }
-  }
-
-  if (!canViewUsers) {
-    return (
-      <>
-        <PageMeta title="Users" description="Manage application users" />
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-white/90">
-            Access Denied
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            You do not have permission to view users.
-          </p>
-        </div>
-      </>
-    );
   }
 
   return (
@@ -351,6 +351,7 @@ export default function Users() {
                 canView={canViewUsers}
                 canUpdate={canUpdateUsers}
                 canDelete={canDeleteUsers}
+                canRestore={canRestoreUsers}
                 onSort={handleSort}
                 onDelete={openDeleteConfirmation}
                 onRestore={openRestoreConfirmation}

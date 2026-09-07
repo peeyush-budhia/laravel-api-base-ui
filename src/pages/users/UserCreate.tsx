@@ -8,6 +8,7 @@ import type { Role } from '../../types/role';
 import type { UserStatus } from '../../types/user';
 
 import PageMeta from '../../components/common/PageMeta';
+import { useToast } from '../../components/common/useToast';
 import UserForm from '../../components/users/UserForm';
 
 import { routes } from '../../routes/routes';
@@ -27,6 +28,7 @@ interface FieldErrors {
 
 export default function UserCreate() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
@@ -95,6 +97,12 @@ export default function UserCreate() {
         status,
       });
 
+      showToast({
+        title: 'User Created',
+        message:
+          'The user was created and will receive an account activation email.',
+      });
+
       navigate(routes.users.index);
     } catch (error: unknown) {
       setFieldErrors(getApiFieldErrors(error) as FieldErrors);
@@ -147,7 +155,7 @@ export default function UserCreate() {
             generalError={generalError}
             submitLabel="Save User"
             submittingLabel="Saving..."
-            passwordMessage="A secure password will be generated automatically and sent to the user's email address. The user will be required to change the password after the first login."
+            passwordMessage="The user will receive an expiring activation link by email to create their password. No temporary password will be sent."
             onFirstNameChange={setFirstName}
             onLastNameChange={setLastName}
             onEmailChange={setEmail}

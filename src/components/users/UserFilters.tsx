@@ -26,15 +26,15 @@ interface UserFiltersProps {
 const filterOptions = [
   {
     value: 'without',
-    label: 'All users',
+    label: 'Active Users',
   },
   {
     value: 'with',
-    label: 'With deleted',
+    label: 'Active & Deleted Users',
   },
   {
     value: 'only',
-    label: 'Deleted only',
+    label: 'Deleted Users',
   },
 ];
 

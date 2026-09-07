@@ -1,3 +1,5 @@
+import { ReactComponent as ShieldIcon } from './shield.svg?react';
+import { ReactComponent as KeyIcon } from './key.svg?react';
 import { ReactComponent as PlusIcon } from './plus.svg?react';
 import { ReactComponent as CloseIcon } from './close.svg?react';
 import { ReactComponent as BoxIcon } from './box.svg?react';
@@ -112,4 +114,6 @@ export {
   ChatIcon,
   AngleLeftIcon,
   AngleRightIcon,
+  ShieldIcon,
+  KeyIcon,
 };

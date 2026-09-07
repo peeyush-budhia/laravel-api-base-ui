@@ -1,11 +1,60 @@
 # Release Notes
 
+## v0.9.0 — 2026-09-07
+
+The v0.9.0 release completes frontend feature parity with the backend API,
+including account activation, profile and security flows, permission-aware user
+and role management, dashboard and audit integrations, and the frontend quality
+workflow.
+
+See the backend [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+for the complete backend and frontend setup.
+
 ## v0.8.0
 
 Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
 
+### Auth and Profile
+
+- Added account activation for administrator-created users through expiring
+  onboarding links and the existing password-reset API contract.
+- Account activation now verifies the onboarding email when the user
+  successfully chooses their password.
+- Completed token lifecycle handling and root redirect stability.
+- Confirmed remember-me persistence behavior and invalid-session recovery.
+- Completed profile avatar, profile update, and password/security action cleanup.
+- Standardized success feedback with toast notifications in profile and password flows.
+
+### Dashboard
+
+- Reviewed dashboard widget states for loading, empty, and error handling.
+- Standardized recent activity formatting and dashboard fallback behavior.
+- Replaced dashboard metric placeholders with colored SVG icons.
+
+### Users
+
+- Reviewed permission-driven actions across the user list and detail flows.
+- Added confirmation dialogs for delete, restore, and permanent delete actions.
+- Standardized success notifications after user actions.
+- Centralized route guard behavior to redirect denied users to an allowed route.
+
+### Roles & Permissions
+
+- Reviewed permission-driven actions across the role list, detail, create, and edit flows.
+- Added confirmation before deleting roles and syncing permissions.
+- Standardized success notifications after role actions.
+- Validated permission loading, empty, and error states for role permission management.
+
+### Audit Logs
+
+- Reviewed audit log list and detail display consistency.
+- Standardized audit log user and date formatting across list, dashboard, and detail views.
+- Improved pagination, filter, and empty-state handling for audit log screens.
+- Centralized permission-based access behavior for audit logs.
+
 ### Testing
 
+- Kept dashboard and sidebar tests isolated from SVG icon implementations.
 - Added a Vitest test setup with jsdom and shared test setup.
 - Added API service tests for auth, users, roles, profile, dashboard, and audit logs.
 - Added route and authorization tests.
@@ -27,6 +76,9 @@ Current work on the frontend expands the project beyond API integration into tes
 
 ### Cleanup
 
+- Removed the obsolete standalone change-password route and
+  `must_change_password` API state; authenticated password changes remain in
+  the profile security section.
 - Removed unused settings and signup screens from the routed application.
 
 ## v0.7.0
