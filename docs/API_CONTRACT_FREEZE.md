@@ -18,7 +18,9 @@ depend on Axios-specific error objects in components.
 
 The backend supplies display metadata for enum-backed values: user
 status_label, audit event_label, and permission description. The frontend
-renders those fields and keeps only machine-value types and color mappings.
+renders those fields and generates machine-value types from the committed
+OpenAPI snapshot. It keeps only the visual mapping from semantic backend tones
+to local component colors.
 
 Tone values are semantic (success, warning, danger, or info); each frontend
 maps them to its own visual design system.

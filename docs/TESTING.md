@@ -12,9 +12,11 @@ Global test setup lives in `src/test/setup.ts`.
 
 ## Commands
 
-- `npm run test` runs the full test suite once.
+- `npm test` runs the full test suite once.
 - `npm run test:watch` keeps the test runner active during development.
 - `npm run test:coverage` runs coverage reporting.
+- `npm run api:check` verifies that committed generated API types match the
+  committed OpenAPI snapshot.
 
 ## Current Coverage Areas
 
@@ -26,6 +28,8 @@ The repository includes tests for:
 - Password policy validation
 - Common loading, error, and empty states
 - Password change UI behavior
+- Account activation, profile, user, role, dashboard, and audit-log pages
+- Backend-provided status and audit metadata with semantic tone rendering
 
 ## Writing Tests
 
@@ -51,8 +55,10 @@ the following checks to pass:
 
 - `npm run format:check`
 - `npm run lint`
+- `npm run api:check`
 - `npm test`
 - `npm run build`
 
-Run the same commands locally before opening a pull request. Formatting and
-lint failures are reported before the test and production-build steps.
+Run the same commands locally before opening a pull request. The v1.0.0 clean
+release-candidate installation passes 120 tests as well as formatting, lint,
+contract freshness, and production-build checks.

@@ -1,5 +1,52 @@
 # Release Notes
 
+The latest published release is **v0.9.0**, released on 2026-09-07. The
+`release/v1.0.0` branch is the validated v1.0.0 release candidate.
+
+## v1.0.0 — Unreleased
+
+v1.0.0 establishes the production baseline shared with Laravel API Base. The
+frontend is frozen against the backend `/api/v1` contract and has been
+validated from a clean installation.
+
+### API contract
+
+- Committed the coordinated backend OpenAPI snapshot under `openapi/`.
+- Generate `UserStatus` and `AuditEvent` from backend schemas with
+  `npm run api:generate`.
+- Enforce generated-type freshness with `npm run api:check` locally and in CI.
+- Consume backend labels, descriptions, and semantic tones while mapping tones
+  to local component colors through one reusable adapter.
+
+### Production readiness
+
+- Added production configuration, SPA hosting, CORS coordination, queue-worker
+  dependency, security, accessibility, and performance guidance.
+- Hardened session handling so only unauthorized responses clear the stored
+  token.
+- Added route-level lazy loading and removed unused ecommerce code and assets.
+- Improved accessible controls, validation messages, live status feedback,
+  navigation, and responsive layouts.
+
+### Quality gates
+
+- GitHub Actions checks formatting, ESLint, generated API types, all tests, and
+  the production build.
+- The clean release-candidate installation passes 120 tests plus formatting,
+  linting, contract freshness, and production build validation.
+
+### Upgrade notes
+
+- Use the matching Laravel API Base v1.0.0 contract snapshot.
+- Copy `vite.config.example.ts` to the ignored `vite.config.ts` during setup.
+- Configure `VITE_API_BASE_URL` with the backend `/api/v1` URL and add the
+  deployed frontend origin to backend `CORS_ALLOWED_ORIGINS`.
+- Regenerate committed types whenever the backend contract snapshot changes.
+
+Release publication still requires merging the coordinated release branches,
+running final checks on `main`, creating the `v1.0.0` tags, and publishing the
+matching GitHub releases.
+
 ## v0.9.0 — 2026-09-07
 
 The v0.9.0 release completes frontend feature parity with the backend API,
@@ -10,9 +57,10 @@ workflow.
 See the backend [docs/SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
 for the complete backend and frontend setup.
 
-## v0.8.0
+## v0.8.0 — 2026-09-03
 
-Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
+The v0.8.0 frontend work expanded the project beyond API integration into test
+coverage and UX consistency.
 
 ### Auth and Profile
 
@@ -81,9 +129,10 @@ Current work on the frontend expands the project beyond API integration into tes
   the profile security section.
 - Removed unused settings and signup screens from the routed application.
 
-## v0.7.0
+## v0.7.1 — 2026-08-24
 
-The `v0.7.0` frontend work aligns the UI with the Laravel API Base documentation and API integration structure.
+The v0.7.1 frontend release aligned the UI with the Laravel API Base
+documentation and API integration structure.
 
 ### API Integration
 

@@ -21,8 +21,10 @@ Vite embeds `VITE_*` values into the bundle, so do not put secrets in them.
 
 ```bash
 npm ci
+npm run format:check
 npm run lint
-npm test -- --run
+npm run api:check
+npm test
 npm run build
 ```
 

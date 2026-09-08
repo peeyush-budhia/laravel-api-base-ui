@@ -5,8 +5,9 @@ This document describes how `laravel-api-base-ui` consumes the Laravel API Base 
 The v1.0.0 compatibility boundary is recorded in [API_CONTRACT_FREEZE.md](API_CONTRACT_FREEZE.md).
 
 User, audit, and permission display text comes from backend fields
-status_label, event_label, and description. The frontend keeps only stable
-machine-value types and visual color mappings.
+status_label, event_label, and description. Stable machine-value types are
+generated from the committed backend OpenAPI snapshot. The frontend keeps only
+the visual mapping from semantic backend tones to its component colors.
 
 Production hosting and the backend origin required for browser requests are
 covered in [PRODUCTION.md](PRODUCTION.md).

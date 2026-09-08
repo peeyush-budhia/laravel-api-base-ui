@@ -13,7 +13,7 @@ This repository contains the frontend for the Laravel API Base backend.
 1. Install dependencies.
 
 ```bash
-npm install
+npm ci
 ```
 
 Create the local Vite configuration from the tracked example before running
@@ -38,6 +38,8 @@ cp .env.example .env
 
 - `npm run dev` starts the Vite development server.
 - `npm run build` runs the TypeScript build and creates a production bundle.
+- `npm run api:generate` regenerates backend-owned types from the OpenAPI snapshot.
+- `npm run api:check` fails when committed generated types are stale.
 - `npm run lint` runs ESLint across the project.
 - `npm run format:check` verifies Prettier formatting.
 - `npm run test` runs the Vitest suite once.
