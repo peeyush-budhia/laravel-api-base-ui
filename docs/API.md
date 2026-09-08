@@ -4,10 +4,18 @@ This document describes how `laravel-api-base-ui` consumes the Laravel API Base 
 
 The v1.0.0 compatibility boundary is recorded in [API_CONTRACT_FREEZE.md](API_CONTRACT_FREEZE.md).
 
+User, audit, and permission display text comes from backend fields
+status_label, event_label, and description. The frontend keeps only stable
+machine-value types and visual color mappings.
+
 Production hosting and the backend origin required for browser requests are
 covered in [PRODUCTION.md](PRODUCTION.md).
 
 ## Backend
+
+The backend supplies status_label/status_tone, event_label/event_tone, and
+permission description fields. The shared semantic tone adapter maps those
+values to this frontend's badge colors.
 
 - [Laravel API Base repository](https://github.com/peeyush-budhia/laravel-api-base)
 - [Backend API documentation](https://github.com/peeyush-budhia/laravel-api-base/tree/main/docs)
@@ -272,12 +280,13 @@ The frontend README links to the backend repository and backend documentation.
 
 When a backend release changes an API contract:
 
-1. Update `src/api/endpoints.ts` if routes changed.
-2. Update the relevant API service.
-3. Update TypeScript types.
-4. Update permission constants if permissions changed.
-5. Update this document.
-6. Run lint and build.
+1. Export the backend snapshot with `composer contract:export`.
+2. Copy backend `docs/openapi.json` to `openapi/openapi.json`.
+3. Run `npm run api:generate`; `UserStatus` and `AuditEvent` are generated from
+   the backend schemas and must not be edited manually.
+4. Update `src/api/endpoints.ts` and the relevant API service if needed.
+5. Update handwritten response types and permission constants if needed.
+6. Update this document and run `npm run api:check`, lint, tests, and build.
 7. Record the compatibility change in the frontend release notes.
 
 ## Current Backend

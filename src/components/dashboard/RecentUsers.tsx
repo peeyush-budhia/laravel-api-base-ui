@@ -71,7 +71,7 @@ export default function RecentUsers({ users }: RecentUsersProps) {
                         : 'warning'
                   }
                 >
-                  {user.status}
+                  {user.status_label ?? user.status}
                 </Badge>
               </div>
             );

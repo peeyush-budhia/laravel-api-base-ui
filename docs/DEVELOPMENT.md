@@ -50,17 +50,20 @@ cp .env.example .env
 - `src/auth/` contains authentication state, permissions, and token helpers.
 - `src/components/` contains reusable UI and feature components.
 - `src/pages/` contains route-level screens.
-- `src/types/` contains shared TypeScript types.
+- `src/types/` contains shared TypeScript types. Backend-owned enums are
+  generated in `src/types/generated/api.ts` from `openapi/openapi.json`.
 
 ## Backend Alignment
 
 When backend routes, payloads, permissions, or validation rules change:
 
-1. Update the relevant API module.
-2. Update the related TypeScript types.
-3. Update the UI and route guards if required.
-4. Update the API documentation in `docs/API.md`.
-5. Update the roadmap or release notes if the change affects delivery status.
+1. Run `composer contract:export` in the backend repository.
+2. Copy backend `docs/openapi.json` to frontend `openapi/openapi.json`.
+3. Run `npm run api:generate` and review the generated type changes.
+4. Update the relevant API module and handwritten response types.
+5. Update the UI and route guards if required.
+6. Update the API documentation in `docs/API.md`.
+7. Run `npm run api:check`, lint, tests, and the production build.
 
 ## Testing Account Onboarding
 

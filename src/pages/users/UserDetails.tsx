@@ -5,7 +5,7 @@ import { permissions } from '../../auth/permissions';
 import { useAuthorization } from '../../auth/useAuthorization';
 import { usersApi } from '../../api/users';
 import type { User } from '../../types/user';
-import { userStatusColors, userStatusLabels } from '../../types/user';
+import { semanticToneColors } from '../../types/semanticTone';
 import { routes } from '../../routes/routes';
 import { SUPER_ADMIN_ROLE } from '../../constants/roles';
 import { getApiErrorMessage } from '../../utils/apiErrorUtils';
@@ -215,8 +215,11 @@ export default function UserDetails() {
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <Badge size="sm" color={userStatusColors[user.status]}>
-                        {userStatusLabels[user.status]}
+                      <Badge
+                        size="sm"
+                        color={semanticToneColors[user.status_tone ?? 'info']}
+                      >
+                        {user.status_label ?? user.status}
                       </Badge>
 
                       {user.role && (
@@ -280,8 +283,11 @@ export default function UserDetails() {
                 <DetailItem
                   label="Status"
                   value={
-                    <Badge size="sm" color={userStatusColors[user.status]}>
-                      {userStatusLabels[user.status]}
+                    <Badge
+                      size="sm"
+                      color={semanticToneColors[user.status_tone ?? 'info']}
+                    >
+                      {user.status_label ?? user.status}
                     </Badge>
                   }
                 />

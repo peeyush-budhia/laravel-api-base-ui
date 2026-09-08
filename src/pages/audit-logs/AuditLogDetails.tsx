@@ -7,7 +7,7 @@ import { getApiErrorMessage } from '../../utils/apiErrorUtils';
 
 import { auditLogsApi } from '../../api/auditLogs';
 
-import type { AuditEvent, AuditLog } from '../../types/auditLog';
+import type { AuditLog } from '../../types/auditLog';
 
 import { routes } from '../../routes/routes';
 
@@ -15,25 +15,17 @@ import PageMeta from '../../components/common/PageMeta';
 import Badge from '../../components/ui/badge/Badge';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
-import { auditEventLabels, auditEventColors } from '../../types/auditLog';
+import { semanticToneColors } from '../../types/semanticTone';
 import AuditLogUserDisplay from '../../components/audit-logs/AuditLogUserDisplay';
 
-function getEventLabel(event: string): string {
-  if (event in auditEventLabels) {
-    return auditEventLabels[event as AuditEvent];
+function getEventLabel(event: string, label?: string | null): string {
+  if (label) {
+    return label;
   }
 
-  return event.replaceAll('_', ' ');
-}
-
-function getEventColor(
-  event: string,
-): 'success' | 'info' | 'error' | 'warning' | 'primary' {
-  if (event in auditEventColors) {
-    return auditEventColors[event as AuditEvent];
-  }
-
-  return 'primary';
+  return event
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function getResourceName(type: string): string {
@@ -138,8 +130,13 @@ export default function AuditLogDetails() {
           <div className="grid gap-x-8 gap-y-6 p-5 sm:grid-cols-2 lg:grid-cols-3">
             {/* Event */}
             <DetailItem label="Event">
-              <Badge size="sm" color={getEventColor(log.event)}>
-                {getEventLabel(log.event)}
+              <Badge
+                size="sm"
+                color={
+                  log.event_tone ? semanticToneColors[log.event_tone] : 'light'
+                }
+              >
+                {getEventLabel(log.event, log.event_label)}
               </Badge>
             </DetailItem>
 

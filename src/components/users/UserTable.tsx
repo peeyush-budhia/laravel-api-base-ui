@@ -12,11 +12,8 @@ import Badge from '../ui/badge/Badge';
 
 import { LoadingRows, SortableHeader } from '../common/Table';
 
-import {
-  userStatusColors,
-  userStatusLabels,
-  type User,
-} from '../../types/user';
+import { type User } from '../../types/user';
+import { semanticToneColors } from '../../types/semanticTone';
 
 import { routes } from '../../routes/routes';
 
@@ -153,8 +150,11 @@ export default function UserTable({
                       Deleted
                     </Badge>
                   ) : (
-                    <Badge size="sm" color={userStatusColors[user.status]}>
-                      {userStatusLabels[user.status]}
+                    <Badge
+                      size="sm"
+                      color={semanticToneColors[user.status_tone ?? 'info']}
+                    >
+                      {user.status_label ?? user.status}
                     </Badge>
                   )}
                 </TableCell>

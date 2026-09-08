@@ -55,6 +55,8 @@ The backend API is the source of truth for routes, payloads, permissions, and va
 ```bash
 npm run dev            # start Vite development server
 npm run build          # type-check and create the production bundle
+npm run api:generate   # regenerate backend-owned enum types from OpenAPI
+npm run api:check      # verify committed generated types are current
 npm run lint           # run ESLint
 npm run format:check   # verify Prettier formatting
 npm test               # run the Vitest suite

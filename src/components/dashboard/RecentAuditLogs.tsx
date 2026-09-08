@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '../ui/table';
 import EmptyState from '../common/EmptyState';
-import { auditEventColors } from '../../types/auditLog';
+import { semanticToneColors } from '../../types/semanticTone';
 
 interface RecentAuditLogsProps {
   logs: DashboardAuditLog[];
@@ -76,13 +76,13 @@ export default function RecentAuditLogs({ logs }: RecentAuditLogsProps) {
                     <Badge
                       size="sm"
                       color={
-                        auditEventColors[
-                          log.event as keyof typeof auditEventColors
-                        ] ?? 'light'
+                        log.event_tone
+                          ? semanticToneColors[log.event_tone]
+                          : 'light'
                       }
                     >
                       <div className="capitalize">
-                        {log.event.replaceAll('_', ' ')}
+                        {log.event_label ?? log.event.replaceAll('_', ' ')}
                       </div>
                     </Badge>
                   </TableCell>

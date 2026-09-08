@@ -16,6 +16,13 @@ All responses use `success`, `status`, `message`, `data`, `errors`, and `meta`.
 The frontend normalizes failures into `{ status, message, errors }` and must not
 depend on Axios-specific error objects in components.
 
+The backend supplies display metadata for enum-backed values: user
+status_label, audit event_label, and permission description. The frontend
+renders those fields and keeps only machine-value types and color mappings.
+
+Tone values are semantic (success, warning, danger, or info); each frontend
+maps them to its own visual design system.
+
 ## Frozen endpoint surface
 
 The frontend integration is frozen against these paths:
@@ -50,11 +57,14 @@ successful activation verifies the email on the backend.
 
 When the backend contract changes:
 
-1. Update the backend `docs/API.md` and generated OpenAPI documentation.
-2. Update `src/api/endpoints.ts`, service methods, and TypeScript types.
-3. Update this document and the frontend `docs/API.md`.
-4. Add or update behavior tests in both repositories.
-5. Run frontend lint, tests, and build plus the backend test, lint, analysis,
-   and OpenAPI checks.
+1. Update the backend `docs/API.md` and run `composer contract:export`.
+2. Copy backend `docs/openapi.json` to frontend `openapi/openapi.json` and run
+   `npm run api:generate`.
+3. Update `src/api/endpoints.ts`, service methods, and handwritten response
+   types where needed.
+4. Update this document and the frontend `docs/API.md`.
+5. Add or update behavior tests in both repositories.
+6. Run frontend contract, lint, test, and build checks plus the backend test,
+   lint, analysis, and OpenAPI checks.
 
 Breaking changes require a new API version or an explicit release decision.

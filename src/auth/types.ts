@@ -1,4 +1,6 @@
-export type AuthUserStatus = 'active' | 'inactive' | 'suspended';
+import type { UserStatus } from '../types/generated/api';
+
+export type AuthUserStatus = UserStatus;
 
 export interface AuthUser {
   id: string;
@@ -10,6 +12,8 @@ export interface AuthUser {
   role: string | null;
   permissions: string[];
   status: AuthUserStatus;
+  status_label?: string | null;
+  status_tone?: 'success' | 'warning' | 'danger' | 'info' | null;
   email_verified_at: string | null;
   last_login_at: string | null;
   created_at: string | null;
