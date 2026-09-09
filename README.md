@@ -2,8 +2,7 @@
 
 Laravel API Base UI is the React and TypeScript frontend for the [Laravel API Base](https://github.com/peeyush-budhia/laravel-api-base) backend. It provides browser flows for authentication, account activation, profiles, users, roles, permissions, audit logs, and dashboard statistics.
 
-Latest published release: **v0.9.0** (2026-09-07). The
-`release/v1.0.0` branch contains the validated v1.0.0 release candidate.
+Latest published release: **v1.0.0** (2026-09-09).
 
 ## Requirements
 

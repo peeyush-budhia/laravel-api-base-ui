@@ -1,8 +1,8 @@
 # Roadmap
 
-## Current
+## Released
 
-### v1.0.0 — Production Baseline (Release Candidate)
+### v1.0.0 — Production Baseline (2026-09-09)
 
 - [x] Freeze compatibility with the backend `/api/v1` contract.
 - [x] Generate backend-owned enum types from the committed OpenAPI snapshot.
@@ -15,14 +15,12 @@
 - [x] Complete performance review, route splitting, and unused-code cleanup.
 - [x] Establish CI release gates for contract freshness, formatting, linting,
       tests, and production builds.
-- [x] Validate a clean installation against the backend release candidate.
+- [x] Validate a clean installation against the backend v1.0.0 release.
 - [x] Review and synchronize project documentation.
-- [ ] Merge the coordinated backend and frontend release branches.
-- [ ] Run final release gates on `main` in both repositories.
-- [ ] Create and push matching `v1.0.0` tags.
-- [ ] Publish matching GitHub releases.
-
-## Released
+- [x] Merge the coordinated backend and frontend release branches.
+- [x] Run final release gates on `main` in both repositories.
+- [x] Create and push matching `v1.0.0` tags.
+- [x] Publish matching GitHub releases.
 
 ### v0.9.0 — Frontend Feature Completeness (2026-09-07)
 
