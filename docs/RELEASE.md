@@ -1,9 +1,8 @@
 # Release Notes
 
-The latest published release is **v0.9.0**, released on 2026-09-07. The
-`release/v1.0.0` branch is the validated v1.0.0 release candidate.
+The latest published release is **v1.0.0**, released on 2026-09-09.
 
-## v1.0.0 — Unreleased
+## v1.0.0 — 2026-09-09
 
 v1.0.0 establishes the production baseline shared with Laravel API Base. The
 frontend is frozen against the backend `/api/v1` contract and has been
@@ -54,9 +53,8 @@ validated from a clean installation.
   embeds it into the static bundle during the Docker build.
 - Regenerate committed types whenever the backend contract snapshot changes.
 
-Release publication still requires merging the coordinated release branches,
-running final checks on `main`, creating the `v1.0.0` tags, and publishing the
-matching GitHub releases.
+The coordinated backend and frontend gates passed before promotion to `main`.
+Both repositories are tagged `v1.0.0` and publish matching GitHub releases.
 
 ## v0.9.0 — 2026-09-07
 

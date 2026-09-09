@@ -4,7 +4,7 @@ Notable changes to Laravel API Base UI are recorded here. The project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and semantic
 versioning.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-09-09
 
 ### Added
 
@@ -48,7 +48,7 @@ versioning.
 
 - Verified a clean installation with the locked dependency graph.
 - Passed 123 frontend tests, formatting, linting, API contract freshness, and
-  the production build against the coordinated backend release candidate.
+  the production build against the coordinated backend v1.0.0 release.
 - Built and inspected the production Nginx image, including the absence of Node
   tooling, the readiness endpoint, and SPA route fallback.
 
