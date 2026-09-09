@@ -13,6 +13,11 @@ VITE_* configuration intended for browsers may be embedded at build time.
 - Configure SPA fallback to index.html without exposing repository files.
 - Treat localStorage tokens as XSS-sensitive; keep dependencies patched and
   avoid rendering unsanitized HTML.
+- The production Nginx image adds content-type, frame, and referrer headers,
+  exposes only the generated `dist/` bundle, and contains no Node runtime or
+  repository source.
+- Keep `.env.production` outside Git. Only public `VITE_*` build values belong
+  in the image; credentials must remain in backend or hosting secrets.
 
 Remembered sessions use `localStorage`. Non-remembered sessions use
 `sessionStorage` and are shared transiently with other currently open

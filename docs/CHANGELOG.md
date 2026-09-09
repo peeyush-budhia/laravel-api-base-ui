@@ -8,6 +8,10 @@ versioning.
 
 ### Added
 
+- Added a production multi-stage Docker image, Nginx SPA configuration,
+  readiness check, Compose definition, and Docker CI build.
+- Added release-branch Docker and frontend quality gates, immutable asset
+  caching, no-store HTML caching, and production security headers.
 - Added a committed backend OpenAPI snapshot and dependency-free generated
   TypeScript types for backend-owned `UserStatus` and `AuditEvent` values.
 - Added API contract freshness checks to the local workflow and GitHub Actions.
@@ -19,6 +23,7 @@ versioning.
 
 ### Changed
 
+- Set the frontend package metadata to `1.0.0` for the coordinated release.
 - Display user-status labels, audit-event labels, permission descriptions, and
   semantic tones supplied by the backend.
 - Centralized the mapping from backend semantic tones to this frontend's badge
@@ -44,6 +49,8 @@ versioning.
 - Verified a clean installation with the locked dependency graph.
 - Passed 123 frontend tests, formatting, linting, API contract freshness, and
   the production build against the coordinated backend release candidate.
+- Built and inspected the production Nginx image, including the absence of Node
+  tooling, the readiness endpoint, and SPA route fallback.
 
 ## [0.9.0] - 2026-09-07
 

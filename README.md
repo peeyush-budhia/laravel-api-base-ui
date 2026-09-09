@@ -66,7 +66,8 @@ npm test               # run the Vitest suite
 ```
 
 GitHub Actions verifies generated API types, formatting, linting, all tests,
-and the production build.
+the production build, and the production Nginx image on feature and release
+branches and on pull requests.
 
 ## Account activation
 
@@ -86,6 +87,10 @@ The backend sends an expiring activation link after a new user is committed. The
 - [Roadmap](docs/ROADMAP.md)
 - [Backend setup guide](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
 - [v1.0.0 frontend API contract freeze](docs/API_CONTRACT_FREEZE.md)
+
+The production guide includes an immutable multi-stage Docker image and Nginx
+configuration for SPA routing, static-asset caching, security headers, and
+readiness checks.
 
 ## Contributing and license
 

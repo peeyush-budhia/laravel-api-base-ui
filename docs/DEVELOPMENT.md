@@ -54,6 +54,10 @@ cp .env.example .env
 - `src/pages/` contains route-level screens.
 - `src/types/` contains shared TypeScript types. Backend-owned enums are
   generated in `src/types/generated/api.ts` from `openapi/openapi.json`.
+- `docker/nginx/default.conf` contains the production SPA, caching, security,
+  and readiness configuration.
+- `Dockerfile` and `docker-compose.production.yml` build and run the immutable
+  production frontend image.
 
 ## Backend Alignment
 

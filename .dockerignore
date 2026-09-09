@@ -1,0 +1,14 @@
+.git
+.github
+.agents
+.codex
+.env
+.env.*
+!.env.example
+!.env.production.example
+docker-compose*.yml
+docs
+dist
+node_modules
+vite.config.ts
+*.log

@@ -34,6 +34,38 @@ for unknown application routes so direct navigation to `/activate-account`,
 long-lived immutable caching for hashed assets while keeping `index.html`
 short-lived.
 
+## Production Docker image
+
+The production Dockerfile builds the application with Node and copies only the
+generated `dist/` output into Nginx. The runtime image contains no Node.js,
+source tree, or development dependencies. Nginx provides SPA fallback,
+immutable caching for hashed assets, security headers, and `/healthz` for
+container readiness.
+
+Create the build environment and set the public API URL:
+
+```bash
+cp .env.production.example .env.production
+docker compose --env-file .env.production -f docker-compose.production.yml build
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
+```
+
+The container is published on `FRONTEND_PORT` (8081 by default). Terminate TLS
+at the reverse proxy or load balancer and forward requests to that port. Since
+Vite embeds `VITE_API_BASE_URL` during the image build, rebuild the image when
+the API origin changes. Never put credentials in a `VITE_*` value.
+
+For an image-based deployment, publish `FRONTEND_IMAGE` to the registry and
+update the service with:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml pull
+docker compose --env-file .env.production -f docker-compose.production.yml up -d --remove-orphans
+```
+
+Verify `/healthz` and a client-side route such as `/profile` before switching
+traffic. Preserve the previous immutable image tag for rollback.
+
 ## Backend coordination
 
 Before switching traffic, verify that the backend has:

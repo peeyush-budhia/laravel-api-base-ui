@@ -20,6 +20,10 @@ validated from a clean installation.
 
 ### Production readiness
 
+- Added an immutable Nginx runtime image that builds the Vite application with
+  its deployment API URL and exposes a container readiness endpoint.
+- Added a production Compose definition, SPA fallback, immutable hashed-asset
+  caching, no-store HTML caching, and security headers.
 - Added production configuration, SPA hosting, CORS coordination, queue-worker
   dependency, security, accessibility, and performance guidance.
 - Hardened session handling so only unauthorized responses clear the stored
@@ -32,10 +36,13 @@ validated from a clean installation.
 
 ### Quality gates
 
-- GitHub Actions checks formatting, ESLint, generated API types, all tests, and
-  the production build.
+- GitHub Actions checks formatting, ESLint, generated API types, all tests, the
+  production build, and the production Docker image on release branches and
+  pull requests.
 - The clean release-candidate installation passes 123 tests plus formatting,
   linting, contract freshness, and production build validation.
+- The production container passes Nginx syntax, readiness, SPA fallback, and
+  runtime-content checks without Node tooling in the final image.
 
 ### Upgrade notes
 
@@ -43,6 +50,8 @@ validated from a clean installation.
 - Copy `vite.config.example.ts` to the ignored `vite.config.ts` during setup.
 - Configure `VITE_API_BASE_URL` with the backend `/api/v1` URL and add the
   deployed frontend origin to backend `CORS_ALLOWED_ORIGINS`.
+- Rebuild the frontend image whenever `VITE_API_BASE_URL` changes because Vite
+  embeds it into the static bundle during the Docker build.
 - Regenerate committed types whenever the backend contract snapshot changes.
 
 Release publication still requires merging the coordinated release branches,

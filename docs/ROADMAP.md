@@ -8,6 +8,8 @@
 - [x] Generate backend-owned enum types from the committed OpenAPI snapshot.
 - [x] Consume backend display labels, descriptions, and semantic tones.
 - [x] Complete production configuration and deployment guidance.
+- [x] Add an immutable production Nginx image, Compose definition, readiness
+      endpoint, SPA fallback, cache policy, and Docker CI build.
 - [x] Complete security and error-handling review.
 - [x] Complete accessibility review and fixes.
 - [x] Complete performance review, route splitting, and unused-code cleanup.

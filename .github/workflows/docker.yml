@@ -1,0 +1,41 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Production Frontend Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Production Image
+        run: >-
+          docker build
+          --build-arg VITE_APP_ENV=production
+          --build-arg VITE_API_BASE_URL=https://api.example.com/api/v1
+          --tag laravel-api-base-ui:ci
+          .
