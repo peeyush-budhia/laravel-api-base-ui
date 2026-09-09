@@ -1,33 +1,8 @@
 import type { PaginatedResponse } from './pagination';
-
-export type AuditEvent =
-  | 'created'
-  | 'updated'
-  | 'deleted'
-  | 'restored'
-  | 'force_deleted'
-  | 'permissions_synced';
-
-export const auditEventLabels: Record<AuditEvent, string> = {
-  created: 'Created',
-  updated: 'Updated',
-  deleted: 'Deleted',
-  restored: 'Restored',
-  force_deleted: 'Force Deleted',
-  permissions_synced: 'Permissions Synced',
-};
-
-export const auditEventColors: Record<
-  AuditEvent,
-  'success' | 'info' | 'error' | 'warning'
-> = {
-  created: 'success',
-  updated: 'info',
-  deleted: 'error',
-  restored: 'warning',
-  force_deleted: 'error',
-  permissions_synced: 'info',
-};
+import type { SemanticTone } from './semanticTone';
+export { semanticToneColors } from './semanticTone';
+export type { AuditEvent } from './generated/api';
+import type { AuditEvent } from './generated/api';
 
 export interface AuditLogUser {
   id: string;
@@ -40,7 +15,9 @@ export interface AuditLogUser {
 
 export interface AuditLog {
   id: string;
-  event: AuditEvent | string;
+  event: AuditEvent;
+  event_label?: string | null;
+  event_tone?: SemanticTone | null;
   auditable_type: string;
   auditable_id: string;
   user_id: string | null;

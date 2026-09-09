@@ -1,7 +1,7 @@
 {
   "name": "laravel-api-base-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "api:generate": "node scripts/generate-api-types.mjs",
+    "api:check": "node scripts/generate-api-types.mjs --check"
   },
   "dependencies": {
     "apexcharts": "^6.8.0",

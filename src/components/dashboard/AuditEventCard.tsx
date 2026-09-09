@@ -1,24 +1,21 @@
+import type { AuditEvent } from '../../types/auditLog';
 import type { DashboardAuditStatistics } from '../../types/dashboard';
 import EmptyState from '../common/EmptyState';
 import Badge from '../ui/badge/Badge';
+import { semanticToneColors } from '../../types/semanticTone';
 
 interface AuditEventCardProps {
   statistics: DashboardAuditStatistics;
 }
 
-const eventColors = {
-  created: 'success',
-  updated: 'info',
-  deleted: 'error',
-  restored: 'warning',
-  force_deleted: 'error',
-} as const;
-
 export default function AuditEventCard({ statistics }: AuditEventCardProps) {
   const total = Object.values(statistics.by_event).reduce(
-    (sum, value) => sum + value,
+    (sum, value) => sum + (value ?? 0),
     0,
   );
+  const eventCounts = Object.entries(statistics.by_event) as Array<
+    [AuditEvent, number]
+  >;
 
   return (
     <div className="h-full rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
@@ -36,19 +33,25 @@ export default function AuditEventCard({ statistics }: AuditEventCardProps) {
         <EmptyState title="No audit events recorded" message="" />
       ) : (
         <div className="space-y-4">
-          {Object.entries(statistics.by_event).map(([event, count]) => (
+          {eventCounts.map(([event, count]) => (
             <div
               key={event}
               className="flex items-center justify-between rounded-xl border border-gray-100 p-4 dark:border-gray-800"
             >
               <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
-                {event.replaceAll('_', ' ')}
+                {statistics.event_labels?.[event] ?? event.replaceAll('_', ' ')}
               </span>
 
               <Badge
                 size="sm"
                 color={
-                  eventColors[event as keyof typeof eventColors] ?? 'light'
+                  statistics.event_tones?.[event]
+                    ? semanticToneColors[
+                        statistics.event_tones[
+                          event
+                        ] as keyof typeof semanticToneColors
+                      ]
+                    : 'light'
                 }
               >
                 {count.toLocaleString()}

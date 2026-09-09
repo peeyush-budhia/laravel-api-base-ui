@@ -1,85 +1,49 @@
 # Roadmap
 
-## Current
+## Released
 
-### v0.9.0 — Frontend Feature Completeness (Released 2026-09-07)
+### v1.0.0 — Production Baseline (2026-09-09)
 
-- [x] Add a frontend automated test setup
-- [x] Add API service tests
-- [x] Add authentication flow tests
-- [x] Add permission/authorization tests
-- [x] Add user management tests
-- [x] Add role and permission management tests
-- [x] Improve loading and error states
-- [x] Improve empty states
-- [x] Improve form validation feedback
-- [x] Review accessibility across major screens
-- [x] Remove unused settings and signup screens
+- [x] Freeze compatibility with the backend `/api/v1` contract.
+- [x] Generate backend-owned enum types from the committed OpenAPI snapshot.
+- [x] Consume backend display labels, descriptions, and semantic tones.
+- [x] Complete production configuration and deployment guidance.
+- [x] Add an immutable production Nginx image, Compose definition, readiness
+      endpoint, SPA fallback, cache policy, and Docker CI build.
+- [x] Complete security and error-handling review.
+- [x] Complete accessibility review and fixes.
+- [x] Complete performance review, route splitting, and unused-code cleanup.
+- [x] Establish CI release gates for contract freshness, formatting, linting,
+      tests, and production builds.
+- [x] Validate a clean installation against the backend v1.0.0 release.
+- [x] Review and synchronize project documentation.
+- [x] Merge the coordinated backend and frontend release branches.
+- [x] Run final release gates on `main` in both repositories.
+- [x] Create and push matching `v1.0.0` tags.
+- [x] Publish matching GitHub releases.
 
-## Recently Released
+### v0.9.0 — Frontend Feature Completeness (2026-09-07)
 
-### v0.8.0 — Frontend Quality & UX
+- Completed automated coverage for supported API services and application
+  flows.
+- Completed account activation, profile security, permission-aware management,
+  dashboard, and audit-log experiences.
+- Standardized loading, error, empty, confirmation, validation, and notification
+  states.
+- Removed obsolete password-change state and unused routed screens.
 
-### v0.7.x — API Documentation & Integration
+### v0.8.0 — Frontend Quality and UX (2026-09-03)
 
-- [x] Centralized API endpoint definitions
-- [x] Shared API response types
-- [x] Shared API error normalization
-- [x] Authentication API integration
-- [x] Profile API integration
-- [x] User API integration
-- [x] Role and permission API integration
-- [x] Frontend API documentation
-- [x] Link frontend documentation to backend API documentation
-- [x] Link frontend project to backend repository
+- Added dashboard, audit-log, onboarding, and password-policy integration.
+- Added shared page states, initial tests, and UX and accessibility improvements.
 
-## Release history and next work
+### v0.7.1 — API Documentation and Integration (2026-08-24)
 
-### v0.9.x — Frontend Feature Completeness (released as v0.9.0)
+- Added centralized endpoints, response types, error normalization, API service
+  modules, permission-aware authentication, and linked API documentation.
 
-- 1. Auth
-  - [x] Finalize token lifecycle handling
-  - [x] Confirm `remember_me` persistence behavior
-  - [x] Handle token expiry and invalid-session recovery
-  - [x] Keep guest and authenticated root redirects stable
+## After v1.0.0
 
-- 2. Profile
-  - [x] Complete remaining profile functionality
-  - [x] Verify avatar upload and profile image handling
-  - [x] Add consistent success and error feedback
-  - [x] Review password and security-related profile actions
-
-- 3. Dashboard
-  - [x] Improve dashboard integration with real backend data
-  - [x] Review dashboard widgets for loading, empty, and error states
-  - [x] Keep recent activity formatting consistent
-  - [x] Verify dashboard permission and fallback behavior
-
-- 4. Users
-  - [x] Review permission-driven actions in user list, details, edit, and create flows
-  - [x] Add confirmation for delete, restore, and force-delete actions
-  - [x] Standardize notifications after user actions
-  - [x] Check route guards and unauthorized states
-
-- 5. Roles & Permissions
-  - [x] Review permission-driven actions in role list, details, edit, and create flows
-  - [x] Add confirmation for role delete and permission sync actions
-  - [x] Standardize notifications after role actions
-  - [x] Validate empty and error states for permission data
-
-- 6. Audit Logs
-  - [x] Verify list and detail display consistency
-  - [x] Keep date and user formatting consistent
-  - [x] Ensure pagination, filters, and empty states are handled cleanly
-  - [x] Confirm permission-based access behavior
-
-### v1.0.0 — Production Baseline
-
-- [ ] Stable API/backend compatibility
-- [ ] Comprehensive automated test coverage
-- [ ] Production error handling
-- [ ] Production environment configuration
-- [ ] Accessibility review
-- [ ] Performance review
-- [ ] Documentation review
-- [ ] Release/versioning policy finalized
+Future work should be driven by published API changes and measured product
+needs. Backward-compatible features use minor versions; fixes use patch
+versions; breaking API compatibility requires a coordinated major release.

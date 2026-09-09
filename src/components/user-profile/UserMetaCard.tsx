@@ -6,7 +6,7 @@ import {
   getApiErrorMessage,
   getApiFieldErrors,
 } from '../../utils/apiErrorUtils';
-import { userStatusColors, userStatusLabels } from '../../types/user';
+import { semanticToneColors } from '../../types/semanticTone';
 import Badge from '../ui/badge/Badge';
 import { useToast } from '../common/useToast';
 
@@ -29,9 +29,6 @@ export default function UserMetaCard() {
 
   const initials =
     `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
-
-  const userStatusKey = (user.status ??
-    'active') as keyof typeof userStatusColors;
 
   function handleAvatarClick() {
     if (!isUploading) {
@@ -172,8 +169,11 @@ export default function UserMetaCard() {
               <div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block" />
 
               <p>
-                <Badge size="sm" color={userStatusColors[userStatusKey]}>
-                  {userStatusLabels[userStatusKey]}
+                <Badge
+                  size="sm"
+                  color={semanticToneColors[user.status_tone ?? 'info']}
+                >
+                  {user.status_label ?? user.status}
                 </Badge>
               </p>
             </div>

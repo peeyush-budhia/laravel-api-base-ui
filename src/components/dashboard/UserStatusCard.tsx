@@ -1,24 +1,10 @@
 import type { DashboardUserStatistics } from '../../types/dashboard';
 import Badge from '../ui/badge/Badge';
+import { semanticToneColors } from '../../types/semanticTone';
 
 interface UserStatusCardProps {
   statistics: DashboardUserStatistics;
 }
-
-const statusConfig = {
-  active: {
-    label: 'Active',
-    color: 'success' as const,
-  },
-  inactive: {
-    label: 'Inactive',
-    color: 'warning' as const,
-  },
-  suspended: {
-    label: 'Suspended',
-    color: 'error' as const,
-  },
-};
 
 export default function UserStatusCard({ statistics }: UserStatusCardProps) {
   const total = Object.values(statistics.by_status).reduce(
@@ -40,8 +26,6 @@ export default function UserStatusCard({ statistics }: UserStatusCardProps) {
 
       <div className="space-y-5">
         {Object.entries(statistics.by_status).map(([status, count]) => {
-          const config = statusConfig[status as keyof typeof statusConfig];
-
           const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
 
           return (
@@ -49,14 +33,27 @@ export default function UserStatusCard({ statistics }: UserStatusCardProps) {
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
-                    {config?.label ?? status}
+                    {statistics.status_labels?.[
+                      status as keyof typeof statistics.status_labels
+                    ] ?? status}
                   </span>
 
-                  {config && (
-                    <Badge size="sm" color={config.color}>
-                      {count}
-                    </Badge>
-                  )}
+                  <Badge
+                    size="sm"
+                    color={
+                      statistics.status_tones?.[
+                        status as keyof typeof statistics.status_tones
+                      ]
+                        ? semanticToneColors[
+                            statistics.status_tones[
+                              status as keyof typeof statistics.status_tones
+                            ]!
+                          ]
+                        : 'light'
+                    }
+                  >
+                    {count}
+                  </Badge>
                 </div>
 
                 <span className="text-sm text-gray-500 dark:text-gray-400">

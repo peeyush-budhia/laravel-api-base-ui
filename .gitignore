@@ -28,5 +28,6 @@ dist-ssr
 # Local app configuration
 .env.local
 .env
+.env.production
 # Local Vite configuration
 vite.config.ts
