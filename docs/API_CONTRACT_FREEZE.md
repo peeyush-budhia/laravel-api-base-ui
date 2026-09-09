@@ -50,7 +50,9 @@ new endpoints only when existing frontend behavior remains valid.
 ## Authentication and activation
 
 The token is stored by `src/auth/token.ts` and injected by the shared Axios
-client. A `401` clears the token; transient non-authentication failures do not.
+client. Remembered sessions use `localStorage`; active non-remembered sessions
+are exchanged between same-origin tabs and remain in each tab's
+`sessionStorage`. A `401` clears the token; transient non-authentication failures do not.
 Account activation uses the emailed token on `/auth/reset-password`; the
 frontend must submit email, token, password, and password confirmation. A
 successful activation verifies the email on the backend.

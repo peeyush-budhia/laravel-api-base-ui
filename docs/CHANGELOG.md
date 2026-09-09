@@ -34,13 +34,15 @@ versioning.
 
 - Improved accessible names, form error relationships, live status messages,
   keyboard behavior, and responsive navigation across primary screens.
+- Synchronized active non-remembered authentication sessions between open
+  same-origin tabs while keeping their tokens out of persistent storage.
 - Kept authentication sessions intact for transient non-401 API failures while
   still clearing invalid sessions on unauthorized responses.
 
 ### Validation
 
 - Verified a clean installation with the locked dependency graph.
-- Passed 120 frontend tests, formatting, linting, API contract freshness, and
+- Passed 123 frontend tests, formatting, linting, API contract freshness, and
   the production build against the coordinated backend release candidate.
 
 ## [0.9.0] - 2026-09-07

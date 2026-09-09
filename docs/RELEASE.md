@@ -24,6 +24,8 @@ validated from a clean installation.
   dependency, security, accessibility, and performance guidance.
 - Hardened session handling so only unauthorized responses clear the stored
   token.
+- Added same-origin tab synchronization for active non-remembered sessions and
+  logout events without changing their nonpersistent storage policy.
 - Added route-level lazy loading and removed unused ecommerce code and assets.
 - Improved accessible controls, validation messages, live status feedback,
   navigation, and responsive layouts.
@@ -32,7 +34,7 @@ validated from a clean installation.
 
 - GitHub Actions checks formatting, ESLint, generated API types, all tests, and
   the production build.
-- The clean release-candidate installation passes 120 tests plus formatting,
+- The clean release-candidate installation passes 123 tests plus formatting,
   linting, contract freshness, and production build validation.
 
 ### Upgrade notes

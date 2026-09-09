@@ -14,6 +14,13 @@ VITE_* configuration intended for browsers may be embedded at build time.
 - Treat localStorage tokens as XSS-sensitive; keep dependencies patched and
   avoid rendering unsanitized HTML.
 
+Remembered sessions use `localStorage`. Non-remembered sessions use
+`sessionStorage` and are shared transiently with other currently open
+same-origin tabs through `BroadcastChannel`; receiving tabs retain their copy
+only in `sessionStorage`. Closing every tab therefore still ends browser-side
+access to a non-remembered session. Login, logout, and unauthorized-session
+events are synchronized between tabs using the same channel.
+
 ## Error handling
 
 The Axios client converts backend failures into status, message, and errors.

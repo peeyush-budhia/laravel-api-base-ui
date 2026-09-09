@@ -225,6 +225,11 @@ The Axios request interceptor reads the token and sends:
 Authorization: Bearer <token>
 ```
 
+Remembered sessions persist in `localStorage`. Non-remembered sessions remain
+in `sessionStorage`; open same-origin tabs exchange the active token through
+`BroadcastChannel` so navigation in a second tab does not require another
+login. No persistent copy is created for these sessions.
+
 A `401 Unauthorized` response clears the stored access token.
 Non-auth failures while validating the session do not clear the token, so a temporary backend or network issue does not force a logout.
 

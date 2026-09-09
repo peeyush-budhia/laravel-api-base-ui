@@ -60,5 +60,5 @@ the following checks to pass:
 - `npm run build`
 
 Run the same commands locally before opening a pull request. The v1.0.0 clean
-release-candidate installation passes 120 tests as well as formatting, lint,
+release-candidate installation passes 123 tests as well as formatting, lint,
 contract freshness, and production-build checks.
