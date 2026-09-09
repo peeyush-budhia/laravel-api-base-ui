@@ -1,20 +1,8 @@
 import { PaginatedResponse } from './pagination';
-
-export type UserStatus = 'active' | 'inactive' | 'suspended';
-export const userStatusLabels: Record<UserStatus, string> = {
-  active: 'Active',
-  inactive: 'Inactive',
-  suspended: 'Suspended',
-};
-
-export const userStatusColors: Record<
-  UserStatus,
-  'success' | 'warning' | 'error'
-> = {
-  active: 'success',
-  inactive: 'warning',
-  suspended: 'error',
-};
+import type { SemanticTone } from './semanticTone';
+export { semanticToneColors } from './semanticTone';
+export type { UserStatus } from './generated/api';
+import type { UserStatus } from './generated/api';
 
 export type UserTrashedFilter = 'without' | 'with' | 'only';
 export const userTrashedFilterLabels: Record<UserTrashedFilter, string> = {
@@ -33,6 +21,8 @@ export interface User {
   role: string | null;
   permissions: string[];
   status: UserStatus;
+  status_label?: string | null;
+  status_tone?: SemanticTone | null;
   email_verified_at: string | null;
   last_login_at: string | null;
   created_at: string | null;

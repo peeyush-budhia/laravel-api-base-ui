@@ -1,5 +1,63 @@
 # Release Notes
 
+The latest published release is **v0.9.0**, released on 2026-09-07. The
+`release/v1.0.0` branch is the validated v1.0.0 release candidate.
+
+## v1.0.0 — Unreleased
+
+v1.0.0 establishes the production baseline shared with Laravel API Base. The
+frontend is frozen against the backend `/api/v1` contract and has been
+validated from a clean installation.
+
+### API contract
+
+- Committed the coordinated backend OpenAPI snapshot under `openapi/`.
+- Generate `UserStatus` and `AuditEvent` from backend schemas with
+  `npm run api:generate`.
+- Enforce generated-type freshness with `npm run api:check` locally and in CI.
+- Consume backend labels, descriptions, and semantic tones while mapping tones
+  to local component colors through one reusable adapter.
+
+### Production readiness
+
+- Added an immutable Nginx runtime image that builds the Vite application with
+  its deployment API URL and exposes a container readiness endpoint.
+- Added a production Compose definition, SPA fallback, immutable hashed-asset
+  caching, no-store HTML caching, and security headers.
+- Added production configuration, SPA hosting, CORS coordination, queue-worker
+  dependency, security, accessibility, and performance guidance.
+- Hardened session handling so only unauthorized responses clear the stored
+  token.
+- Added same-origin tab synchronization for active non-remembered sessions and
+  logout events without changing their nonpersistent storage policy.
+- Added route-level lazy loading and removed unused ecommerce code and assets.
+- Improved accessible controls, validation messages, live status feedback,
+  navigation, and responsive layouts.
+
+### Quality gates
+
+- GitHub Actions checks formatting, ESLint, generated API types, all tests, the
+  production build, and the production Docker image on release branches and
+  pull requests.
+- The clean release-candidate installation passes 123 tests plus formatting,
+  linting, contract freshness, and production build validation.
+- The production container passes Nginx syntax, readiness, SPA fallback, and
+  runtime-content checks without Node tooling in the final image.
+
+### Upgrade notes
+
+- Use the matching Laravel API Base v1.0.0 contract snapshot.
+- Copy `vite.config.example.ts` to the ignored `vite.config.ts` during setup.
+- Configure `VITE_API_BASE_URL` with the backend `/api/v1` URL and add the
+  deployed frontend origin to backend `CORS_ALLOWED_ORIGINS`.
+- Rebuild the frontend image whenever `VITE_API_BASE_URL` changes because Vite
+  embeds it into the static bundle during the Docker build.
+- Regenerate committed types whenever the backend contract snapshot changes.
+
+Release publication still requires merging the coordinated release branches,
+running final checks on `main`, creating the `v1.0.0` tags, and publishing the
+matching GitHub releases.
+
 ## v0.9.0 — 2026-09-07
 
 The v0.9.0 release completes frontend feature parity with the backend API,
@@ -7,12 +65,13 @@ including account activation, profile and security flows, permission-aware user
 and role management, dashboard and audit integrations, and the frontend quality
 workflow.
 
-See the backend [SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/SETUP_GUIDE.md)
+See the backend [docs/SETUP_GUIDE.md](https://github.com/peeyush-budhia/laravel-api-base/blob/main/docs/SETUP_GUIDE.md)
 for the complete backend and frontend setup.
 
-## v0.8.0
+## v0.8.0 — 2026-09-03
 
-Current work on the frontend expands the project beyond API integration into test coverage and UX consistency.
+The v0.8.0 frontend work expanded the project beyond API integration into test
+coverage and UX consistency.
 
 ### Auth and Profile
 
@@ -81,9 +140,10 @@ Current work on the frontend expands the project beyond API integration into tes
   the profile security section.
 - Removed unused settings and signup screens from the routed application.
 
-## v0.7.0
+## v0.7.1 — 2026-08-24
 
-The `v0.7.0` frontend work aligns the UI with the Laravel API Base documentation and API integration structure.
+The v0.7.1 frontend release aligned the UI with the Laravel API Base
+documentation and API integration structure.
 
 ### API Integration
 

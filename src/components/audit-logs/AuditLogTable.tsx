@@ -6,16 +6,12 @@ import {
   TableRow,
 } from '../ui/table';
 
-import Badge, { type BadgeColor } from '../ui/badge/Badge';
+import Badge from '../ui/badge/Badge';
 
 import { LoadingRows, SortableHeader } from '../common/Table';
 
-import {
-  type AuditEvent,
-  type AuditLog,
-  auditEventColors,
-  auditEventLabels,
-} from '../../types/auditLog';
+import type { AuditLog } from '../../types/auditLog';
+import { semanticToneColors } from '../../types/semanticTone';
 
 import { formatDateTime } from '../../utils/dateTimeUtils';
 import Button from '../ui/button/Button';
@@ -33,12 +29,14 @@ interface AuditLogTableProps {
   onView: (id: string) => void;
 }
 
-function getEventColor(event: string): BadgeColor {
-  return auditEventColors[event as AuditEvent] ?? 'light';
-}
+function getEventLabel(event: string, label?: string | null): string {
+  if (label) {
+    return label;
+  }
 
-function getEventLabel(event: string): string {
-  return auditEventLabels[event as AuditEvent] ?? event;
+  return event
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function getResourceName(type: string): string {
@@ -118,10 +116,17 @@ export default function AuditLogTable({
                   <Link
                     to={routes.auditLogs.show(log.id)}
                     className="inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
-                    aria-label={`View details for ${getEventLabel(log.event)} audit log`}
+                    aria-label={`View details for ${getEventLabel(log.event, log.event_label)} audit log`}
                   >
-                    <Badge size="sm" color={getEventColor(log.event)}>
-                      {getEventLabel(log.event)}
+                    <Badge
+                      size="sm"
+                      color={
+                        log.event_tone
+                          ? semanticToneColors[log.event_tone]
+                          : 'light'
+                      }
+                    >
+                      {getEventLabel(log.event, log.event_label)}
                     </Badge>
                   </Link>
                 </TableCell>
